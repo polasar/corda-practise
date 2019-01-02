@@ -1,0 +1,60 @@
+buildscript {
+    ext.corda_release_group = 'com.r3.corda'
+    ext.corda_release_version = '3.2'
+    ext.corda_gradle_plugins_version = '4.0.25'
+    ext.kotlin_version = '1.2.50'
+    ext.junit_version = '4.12'
+
+
+    repositories {
+        mavenLocal()
+//        jcenter()
+         maven {
+             url 'https://nexus.devops.broadridge.net/repository/BLOCKCHAIN-MAVEN-GROUP/'
+             credentials {
+                 username "polasar"
+                 password "Sbhmabwm8888"
+             }
+         }
+
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        maven {
+            url 'https://nexus.devops.broadridge.net/repository/BLOCKCHAIN-MAVEN-GROUP/'
+                credentials {
+                username "polasar"
+                password "Sbhmabwm8888"
+            }
+        }
+//        maven {
+//             url 'https://mvnrepository.com/artifact/org.json/json'
+//        }
+//        jcenter()
+
+//        maven { url 'https://jitpack.io' }
+//        maven { url 'http://jcenter.bintray.com'}
+        // [Option 1: Add Corda Enterprise binaries in ~/.m2/repos itory or C:\Documents and Settings\{your-username}\.m2]
+        // [Option 2: uncomment the following block and tweak it to point to resolve Corda Enterprise dependencies against your company's repository.]
+//         maven {
+//             url 'https://r3share.mohso.com/fl/UGfYFwsl7H/Corda_Enterprise_3_'
+//             credentials {
+//                 password "JJx8s6PT"
+//             }
+//         }
+        // [Option 3: uncomment the following block and tweak it to point to resolve Corda Enterprise dependencies against a custom path on your local file system.]
+        // maven {
+        //     url 'file://D:/path/to/local/directory'
+        // }
+    }
+}

@@ -1,0 +1,142 @@
+start Issuance segCustodyParty: "O=Natixis,L=London,C=GB", positionQty: "400000", currency: "USD", updatedByUser: "Rajini", originatingAccount: "101010", issuanceDateTime: "2018-06-15", instrumentId: "912810RS8", originatingAccountType: "HIC", segCustodyAccount: "101010", digitalAssetIdentifier: "DA20185181526638186782", assetTokenIdentifier: "TA20185181526638186783"
+
+start TokenIssuanceFlow custodyParty: "O=Custodian,L=New York,C=US", positionQty: "400000", currency: "USD", updatedByUser: "Rajini", originatingAccount: "101010", issuanceDateTime: "2018-06-15", instrumentId: "912810RS8", originatingAccountType: "HIC", custodyAccount: "101010", notificationType: "TokenIssuance", tokenStatus: "pending", notificationId: "123456", digitalAssetIdentifier: "DA20185181526638186782", assetTokenIdentifier: "TA20185181526638186783"
+
+start Issuance segCustodyParty: "O=SocGenBank,L=New York,C=US", positionQty: "500000", currency: "USD", updatedByUser: "Omkar", originatingAccount: "101010", issuanceDateTime: "2018-06-15", instrumentId: "912810RS8", originatingAccountType: "HIC", segCustodyAccount: "101010", digitalAssetIdentifier: "DA20185181526638186782", assetTokenIdentifier: "TA20185181526638186783"
+
+start IssueCash segCustodyParty: "O=Natixis,L=London,C=GB", cashValue: "600000", currency: "USD", updatedByUser: "Rajini"
+
+start IssueCash segCustodyParty: "O=SocGenBank,L=New York,C=US", cashValue: "800000", currency: "USD", updatedByUser: "Omkar"
+
+run vaultQuery contractStateType: "com.miniproject.states.StockRecordState"
+
+run vaultQuery contractStateType: "com.miniproject.states.Cash"
+
+run vaultQuery contractStateType: "com.miniproject.states.TokenState"
+
+start Initiator originalParty: { "pid": "O=Natixis,L=London,C=GB", "ta": "asdsad", "pt": "asdasdas", "ent": "asdasds", "itr": "asdasdAD", "uid": "sdfsdf" }, counterParty: { "pid": "O=SocGenBank,L=New York,C=US", "ta": "sfsdfsdf", "pt": "asdasdas", "et": "sdfsdaf", "itr": "dasdasd", "uid": "asddasd", "pa": "sadsad" } , trade: { "for": "refid123456789", "er": "hhkh", "py": "ttt", "cpy": "hggcg", "top": "ggcgcg", "tt": "yvvy", "txt": "gcgc", "txs": "hgjhgkg", "repost": "Proposal", "txd": "ggcg", "ed": "vggv", "cvd": "fcfcfcfc", "ced": "asdasd", "pot": "ccffc", "bc": "gygyg", "sc": "vvvgv", "tca": "fhfdfgdf", "cfr": "ccfcf", "dc": "vgvgvg", "ai": "tttc", "tpi": "cfgfc", "id": "vvhvh", "comm": "gvgvgvg" },  "collateral": { "lp": "O=Natixis,L=London,C=GB", "bp": "O=SocGenBank,L=New York,C=US", "ins": "912810RS8", "as": "sfdfs", "qty": "10000", "cp": "dasdas", "dp": "sdfsdf", "pl": "20000", "hc": "dsfsdf", "ncbc": "sdfsdF"}
+
+run vaultQuery contractStateType: "com.miniproject.states.RepoState"
+
+start Approver refId: "refid123456789"
+
+start Evaluate
+
+start MidLifeInit instrumentId: "912810RS8", quantity: "1000.0"
+
+start Approver refId: "refid123456789"
+
+start RepoSettleFlow refId: "refid123456789"
+
+
+start Initiator jSon: "{\"originalParty\": {\"color\": \"blue\",\"type\": \"O=Natixis,L=London,C=GB\"}}",\"Counterparty\": {\"ParticipantID\": \"LeveloneCIS\",\"TradingAccount\": 2,\"ParentAccount\": \"true\",\"ParticipantID\": \"LeveloneCIS\",\"PartyType\": \"LeveloneCIS\",\"Entity\": \"LeveloneCIS\",\"InternalTradeReference\": \"LeveloneCIS\",\"UserID\": \"LeveloneCIS\"},\"Trade\": {\"Notification Type\": \"LeveloneCIS\",\"Notification Status\": 2,\"FOReference\": \"true\",\"ExternalReference\": \"LeveloneCIS\",\"Party\": \"LeveloneCIS\",\"Counterparty\": \"LeveloneCIS\",\"TranOriginatorParty\": \"LeveloneCIS\",\"TradeType\": \"LeveloneCIS\"},\"Collateral\": {\"LenderParticipantID\": \"LeveloneCIS\",\"BorrowerParticipantID\": 2,\"Token\": \"true\",\"Token Description\": \"LeveloneCIS\",\"AssetType\": \"LeveloneCIS\",\"Quantity\": \"LeveloneCIS\",\"CleanPrice\": \"LeveloneCIS\",\"DirtyPrice\": \"LeveloneCIS\"}}"
+
+start Initiator jSon: "originalParty: { \"color\": \"O=Natixis,L=London,C=GB\", \"type\": \"O=Natixis,L=London,C=GB\", \"pt\": \"asdasdas\", \"ent\": \"asdasds\", \"itr\": \"asdasdAD\", \"uid\": \"sdfsdf\" }
+, counterParty: { \"pid\": \"O=SocGenBank,L=New York,C=US\", \"ta\": \"sfsdfsdf\", \"pt\": \"asdasdas\", \"et\": \"sdfsdaf\", \"itr\": \"dasdasd\", \"uid\": \"asddasd\", \"pa\": \"sadsad\" } , trade: { \"for\": \"refid123456789\", \"er\": \"hhkh\", \"py\": \"ttt\", \"cpy\": \"hggcg\", \"top\": \"ggcgcg\", \"tt\": \"yvvy\", \"txt\": \"gcgc\", \"txs\": \"hgjhgkg\", \"repost\": \"Proposal\", \"txd\": \"ggcg\", \"ed\": \"vggv\", \"cvd\": \"fcfcfcfc\", \"ced\": \"asdasd\", \"pot\": \"ccffc\", \"bc\": \"gygyg\", \"sc\": \"vvvgv\", \"tca\": \"fhfdfgdf\", \"cfr\": \"ccfcf\", \"dc\": \"vgvgvg\", \"ai\": \"tttc\", \"tpi\": \"cfgfc\", \"id\": \"vvhvh\", \"comm\": \"gvgvgvg\" },  \"collateral\": { \"lp\": \"O=Natixis,L=London,C=GB\", \"bp\": \"O=SocGenBank,L=New York,C=US\", \"ins\": \"912810RS8\", \"as\": \"sfdfs\", \"qty\": \"10000\", \"cp\": \"dasdas\", \"dp\": \"sdfsdf\", \"pl\": \"20000\", \"hc\": \"dsfsdf\", \"ncbc\": \"sdfsdF\"}"
+
+start Approver refId: "refid123456789"
+
+start SettlementFinalFlow refId: "refid123456789"
+
+
+## Attachments
+
+
+------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------
+
+Repo Capture
+
+start CustodianInviationFlow$Initiator  "provider": "O=Custodian,L=Paris,C=FR", "agent": "O=BR,L=Paris,C=FR", "status": "INVITATION PENDING"
+
+run vaultQuery contractStateType: "com.example.state.RepoState"
+
+start RepodealApprover$Initiator refId: "refid123456789"
+
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+Tokens
+
+--------------------------------------------------
+Issuance
+
+start CustodianApprovalFlow omniBusAccountId: "OMNIACC1"
+
+start MarketParticipantAccount accountId: "SOC100"
+
+start MarketParticipantAccount accountId: "NAT100"
+
+start MarketParticipantInvitation participant: "O=SocGen,L=London,C=GB", provider: "O=Custodian,L=Paris,C=FR", agent: "O=BR,L=Paris,C=FR", status: "Marketparticipant Request"
+
+start MarketParticipantInvitation participant: "O=Natixis,L=New York,C=US", provider: "O=Custodian,L=Paris,C=FR", agent: "O=BR,L=Paris,C=FR", status: "Marketparticipant Request"
+
+start CustodianInviationFlow provider: "O=Custodian,L=Paris,C=FR", agent: "O=BR,L=Paris,C=FR", status: "Custodian Invitation"
+
+start CashSetUp instrumentId: "USD", currency: "USD", provider: "O=Custodian,L=Paris,C=FR", observer: "O=BR,L=Paris,C=FR"
+
+start FixedRateBondOnboarding$Initiator omniBusProvider: "O=Custodian,L=Paris,C=FR", omniBusOwner: "O=Custodian,L=Paris,C=FR", omniBusAccountId: "OMNIACC1", accountProvider: "O=Custodian,L=Paris,C=FR", accountOwner: "O=SocGen,L=London,C=GB", accountId: "SOC100"
+
+start FixedRateBondOnboarding$Initiator omniBusProvider: "O=Custodian,L=Paris,C=FR", omniBusOwner: "O=Custodian,L=Paris,C=FR", omniBusAccountId: "OMNIACC1", accountProvider: "O=Custodian,L=Paris,C=FR", accountOwner: "O=Natixis,L=New York,C=US", accountId: "NAT100"
+
+
+start FixedRateBondOnboardingApproval instrumentId: "9801R87"
+
+start FixedRateBondOnboarding$Initiator instrumentId: "9801R89", ownerAccountId: "SOC100", issuer: "O=BR,L=Paris,C=FR"
+
+start FixedRateBondOnboarding$Initiator instrumentId: "9801R85", ownerAccountId: "NAT100", issuer: "O=BR,L=Paris,C=FR"
+
+
+
+
+start FixedRateBondSetUp provider: "O=Custodian,L=Paris,C=FR", instrumentId: "9801R89", observer: "O=BR,L=Paris,C=FR", couponDataTriggered: "2", cusip: "9801R89", isIn: "isInData", rate: 10.0, denomination: 100.0, paymentLag: "2", couponDate: "11/13/2018"
+
+start AssetTransfer owner: "O=SocGen,L=London,C=GB", counterParty: "O=Natixis,L=New York,C=US"
+
+start AssetOnboardingRequest owner: "O=SocGen,L=London,C=GB", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 1000, instrumentId: "9801R89", ownerAccountId: "SOC100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
+
+start AssetOnboardingRequest owner: "O=Natixis,L=New York,C=US", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 1000, instrumentId: "9801R85", ownerAccountId: "NAT100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
+
+
+run vaultQuery contractStateType: "com.example.state.Account"
+run vaultQuery contractStateType: "com.example.state.FixedRateBond"
+run vaultQuery contractStateType: "com.example.state.Bond"
+run vaultQuery contractStateType: "com.example.state.Asset$Cash"
+run vaultQuery contractStateType: "com.example.state.Custodian$Test"
+run vaultQuery contractStateType: "com.example.state.Custodian$Test1"
+run vaultQuery contractStateType: "com.example.state.MarketParticipant$Participant"
+
+net.corda.finance.contracts.asset.Cash.State
+net.corda.finance.contracts.asset.Cash
+
+start RepodealApprover$Initiator refId: "TA20185181526638186783"
+
+start RepoRequest$Initiator counterParty: "O=Natixis,L=New York,C=US", applicantIsBuyer: true, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 1000.0, ustInstrumentId: "9801R89", ustPrice: 1000.0, status: "UNMATCHED"
+
+start RepoRequest$Initiator counterParty: "O=Natixis,L=New York,C=US", applicantIsBuyer: false, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 1000.0, ustInstrumentId: "9801R89", ustPrice: 1000.0, status: "UNMATCHED"
+
+
+start RepoRequest$Initiator counterParty: "O=SocGen,L=London,C=GB", applicantIsBuyer: false, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 1000.0, ustInstrumentId: "9801R89", ustPrice: 1000.0, status: "UNMATCHED"
+
+
+
+start ExampleFlow$Initiator iouValue: 10, otherParty: "O=Natixis,L=New York,C=US"
+
+
+start Initiator jSon: "counterParty: { \"color\": \"O=Natixis,L=London,C=GB\", \"type\": \"O=Natixis,L=London,C=GB\", \"pt\": \"asdasdas\", \"ent\": \"asdasds\", \"itr\": \"asdasdAD\", \"uid\": \"sdfsdf\" }
+
+counterParty: \"O=Natixis,L=New York,C=US\", applicantIsBuyer: true, repoId: \"R1\", eligibilityCriteriaDataId: \"E1\", startDate: \"01\/01\/2000\", endDate: \"01\/01\/2010\", terminationPaymentLeg: \"2\", agent: \"O=Custodian,L=Paris,C=FR\", cashInstrumentId: \"USD\", cashPrice: 1000.0, ustInstrumentId: \"9801R89\", ustPrice: 1000.0, status: \"UNMATCHED\"
+
+run vaultQuery contractStateType: "com.example.state.Repo"
+run vaultQuery contractStateType: "com.example.state.RepoAllege"
+run vaultQuery contractStateType: "com.example.state.DvPStart"
+run vaultQuery contractStateType: "com.example.state.DvPEnd"
+
+start Settlement repoId: "R120190102_135350"
+
+start RepoMatch$Initiator custodian: "O=Custodian,L=Paris,C=FR"
+
+"R120181225_214959",
+
+
+---------------------------------------------------
+
