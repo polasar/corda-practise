@@ -9,6 +9,8 @@ import net.corda.core.serialization.CordaSerializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @CordaSerializable
@@ -29,14 +31,6 @@ public class DvPSchemaV1 extends MappedSchema {
         private Party agent;
         @Column(name = "dvpId")
         private String dvpId;
-        @Column(name = "paymentlegInstrumentId")
-        private String paymentlegInstrumentId;
-        @Column(name = "price")
-        private Long price;
-        @Column(name="deliveryLegInstrumentId")
-        private String deliveryLegInstrumentId;
-        @Column(name = "deliveryLegPrice")
-        private Long deliveryLegPrice;
         @Column(name = "linearId")
         private UUID linearId;
         @Column(name = "settlementDate")
@@ -45,17 +39,12 @@ public class DvPSchemaV1 extends MappedSchema {
         private String repoId;
 
 
-
         public PersistentOper(Party buyer, Party seller, Party agent, String dvpId,
-                               UUID linearId, String settlementDate,String paymentlegInstrumentId,Long price,String deliveryLegInstrumentId,Long deliveryLegPrice,String repoId) {
+                               UUID linearId, String settlementDate,String repoId) {
             this.buyer = buyer;
             this.seller = seller;
             this.agent = agent;
             this.dvpId = dvpId;
-            this.paymentlegInstrumentId = paymentlegInstrumentId;
-            this.price = price;
-            this.deliveryLegInstrumentId = deliveryLegInstrumentId;
-            this.deliveryLegPrice = deliveryLegPrice;
             this.linearId = linearId;
             this.settlementDate = settlementDate;
             this.repoId = repoId;
@@ -66,12 +55,8 @@ public class DvPSchemaV1 extends MappedSchema {
             this.seller = null;
             this.agent = null;
             this.dvpId = null;
-            this.paymentlegInstrumentId = null;
-            this.price = null;
             this.linearId = null;
             this.settlementDate = null;
-            this.deliveryLegInstrumentId = null;
-            this.deliveryLegPrice = null;
             this.repoId = null;
         }
 
@@ -91,32 +76,9 @@ public class DvPSchemaV1 extends MappedSchema {
             return dvpId;
         }
 
-        public String getPaymentlegInstrumentId() {
-            return paymentlegInstrumentId;
-        }
-
-        public Long getPrice() {
-            return price;
-        }
-
-        public UUID getLinearId() {
-            return linearId;
-        }
-
-        public String getSettlementDate() {
-            return settlementDate;
-        }
-
-        public String getDeliveryLegInstrumentId() {
-            return deliveryLegInstrumentId;
-        }
-
-        public Long getDeliveryLegPrice() {
-            return deliveryLegPrice;
-        }
-
         public String getRepoId() {
             return repoId;
         }
+
     }
 }

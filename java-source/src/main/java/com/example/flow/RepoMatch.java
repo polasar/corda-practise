@@ -2,11 +2,9 @@ package com.example.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.example.contract.RepoContract;
+import com.example.schema.CollateralSchemaV1;
 import com.example.schema.RepoAllegeSchemaV1;
-import com.example.state.DvPEnd;
-import com.example.state.DvPStart;
-import com.example.state.Repo;
-import com.example.state.RepoAllege;
+import com.example.state.*;
 import com.google.common.collect.ImmutableSet;
 import net.corda.core.contracts.*;
 import net.corda.core.flows.*;
@@ -35,7 +33,7 @@ public class RepoMatch {
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
 
-        private Party custodian;
+        private Party operator;
 
         private final Step GENERATING_TRANSACTION = new Step("Generating transaction based on new Repo.");
         private final Step VERIFYING_TRANSACTION = new Step("Verifying contract constraints.");
@@ -56,8 +54,8 @@ public class RepoMatch {
                 FINALISING_TRANSACTION
         );
 
-        public Initiator(Party custodian) {
-            this.custodian = custodian;
+        public Initiator(Party operator) {
+            this.operator = operator;
 
         }
 
@@ -73,6 +71,7 @@ public class RepoMatch {
             final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
             VaultService vaultService = getServiceHub().getVaultService();
             Field applicantIsBuyer=null;
+            Field collateralLinearId = null;
             // Stage 1.
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
             Party me = getServiceHub().getMyInfo().getLegalIdentities().get(0);
@@ -99,7 +98,7 @@ public class RepoMatch {
             Vault.Page<RepoAllege> sellerResults = vaultService.queryBy(RepoAllege.class, criteriaSeller);
             List<StateAndRef<RepoAllege>> sellerStates = sellerResults.getStates();
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
-            if(me.equals(custodian)) {
+            if(me.equals(operator)) {
                 for (int i = 0; i < buyerStates.size(); i++) {
 
                     for (int j = 0; j < sellerStates.size(); j++) {
@@ -107,6 +106,21 @@ public class RepoMatch {
                         StateAndRef<RepoAllege> repoAllegeStateAndRef1 = sellerStates.get(j);
                         RepoAllege buyerData = repoAllegeStateAndRef.getState().getData();
                         RepoAllege sellerData = repoAllegeStateAndRef1.getState().getData();
+                        /*
+
+                        GET COLLATERALS
+
+                         */
+                        try {
+                            collateralLinearId = CollateralSchemaV1.PersistentOper.class.getDeclaredField("linearId");
+                        } catch (NoSuchFieldException e) {
+                            e.printStackTrace();
+                        }
+                        CriteriaExpression collateralData = Builder.equal(collateralLinearId, buyerData.getLinearId().getId());
+                        QueryCriteria collateralCriteria = new QueryCriteria.VaultCustomQueryCriteria(applicantIsBuyerTrue);
+                        QueryCriteria collateralQuery = criteria1.and(collateralCriteria);
+                        Vault.Page<Collateral> collateralResults = vaultService.queryBy(Collateral.class, collateralQuery);
+                        Collateral collateral = collateralResults.getStates().get(0).getState().getData();
 // TODO: 12/17/2018 check instrument id from both the states
                         if (!repoAllegeStateAndRef.getState().toString().isEmpty() && !repoAllegeStateAndRef1.getState().toString().isEmpty()
                                 && buyerData.getStatus().equalsIgnoreCase("UNMATCHED") && sellerData.getStatus().equalsIgnoreCase("UNMATCHED")) {
@@ -115,17 +129,19 @@ public class RepoMatch {
                             if (buyerData.getApplicant().equals(sellerData.getCounterParty()) && buyerData.getCounterParty().equals(sellerData.getApplicant())) {
                                 buyerData.setStatus("MATCHED");
                                 sellerData.setStatus("MATCHED");
-                                repo = new Repo(buyerData.getApplicant(), buyerData.getCounterParty(), buyerData.getRepoId(), buyerData.getEligibilityCriteriaDataId(), new UniqueIdentifier(), buyerData.getStartDate(),
-                                        buyerData.getEndDate(), buyerData.getTerminationPaymentLeg(), buyerData.getAgent(), "Matched");
-                                DvPStart = new DvPStart(buyerData.getApplicant(), buyerData.getCounterParty(), "DvP-START", new UniqueIdentifier(),
-                                        buyerData.getEndDate(), buyerData.getPaymentLegs(), buyerData.getDeliveryLegs(), buyerData.getAgent(), buyerData.getRepoId());
-                                DvPEnd = new DvPEnd(buyerData.getApplicant(), buyerData.getCounterParty(), "DvP-END", new UniqueIdentifier(),
-                                        buyerData.getEndDate(), buyerData.getPaymentLegs(), buyerData.getDeliveryLegs(), buyerData.getAgent(),buyerData.getRepoId());
+                                UniqueIdentifier uniqueIdentifier = new UniqueIdentifier();
+                                repo = new Repo(buyerData.getApplicant(), buyerData.getCounterParty(), buyerData.getRepoId(), buyerData.getEligibilityCriteriaDataId(), uniqueIdentifier,
+                                        buyerData.getStartDate(),
+                                        buyerData.getEndDate(), buyerData.getTerminationPaymentLeg(), buyerData.getAgent(),buyerData.getAccountId(),buyerData.getAmount());
+                                DvPStart = new DvPStart(buyerData.getApplicant(), buyerData.getCounterParty(), "DvP-START", uniqueIdentifier,
+                                        buyerData.getEndDate(),collateral.getPledgeCollateralData(), collateral.getBorrowerCollateralData(), buyerData.getAgent(), buyerData.getRepoId());
+                                DvPEnd = new DvPEnd(buyerData.getApplicant(), buyerData.getCounterParty(), "DvP-END", uniqueIdentifier,
+                                        buyerData.getEndDate(), collateral.getPledgeCollateralData(),collateral.getBorrowerCollateralData(),buyerData.getAgent(),buyerData.getRepoId());
                                 repoAllege = new RepoAllege(buyerData.getApplicant(), buyerData.getCounterParty(), buyerData.isApplicantIsBuyer(), buyerData.getRepoId(), buyerData.getEligibilityCriteriaDataId(),
-                                        buyerData.getLinearId(), buyerData.getStartDate(), buyerData.getEndDate(), buyerData.getTerminationPaymentLeg(), buyerData.getAgent(), buyerData.getDeliveryLegs(),
-                                        buyerData.getPaymentLegs(), buyerData.getStatus(),buyerData.getInstrumentId(),buyerData.getQuantity());
+                                        buyerData.getLinearId(), buyerData.getStartDate(), buyerData.getEndDate(), buyerData.getTerminationPaymentLeg(), buyerData.getAgent(), buyerData.getStatus(),
+                                        buyerData.getAccountId(),buyerData.getAmount());
                                 repoAllege1 = new RepoAllege(sellerData.getApplicant(), sellerData.getCounterParty(), sellerData.isApplicantIsBuyer(), sellerData.getRepoId(), sellerData.getEligibilityCriteriaDataId(), sellerData.getLinearId(), sellerData.getStartDate(),
-                                        sellerData.getEndDate(), sellerData.getTerminationPaymentLeg(), sellerData.getAgent(), sellerData.getDeliveryLegs(), sellerData.getPaymentLegs(), sellerData.getStatus(),buyerData.getInstrumentId(),buyerData.getQuantity());
+                                        sellerData.getEndDate(), sellerData.getTerminationPaymentLeg(), sellerData.getAgent(), sellerData.getStatus(),buyerData.getAccountId(),buyerData.getAmount());
 
                                 //Initialize commandData
                                 progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
@@ -194,8 +210,8 @@ public class RepoMatch {
                         ContractState output = stx.getTx().getOutputs().get(0).getData();
                         require.using("This must be an Repo transaction.", output instanceof Repo);
                         RepoAllege repoState = (RepoAllege) output;
-                        Map paymentLegs = repoState.getPaymentLegs();
-                        Object price = paymentLegs.get("price");
+//                        Map paymentLegs = repoState.getPaymentLegs();
+//                        Object price = paymentLegs.get("price");
                         /*require.using("Repo quantity must be greater than Zero.", Double.parseDouble(repoState.getPaymentLegs()) > 100);
                         require.using("Owner of the Repo must be requiredSigner", requiredSigningKeys.contains(me.getOwningKey()));
                         getLogger().info("XXXX get info " + repoState.getCounterParty().getCpparticipantID());*/

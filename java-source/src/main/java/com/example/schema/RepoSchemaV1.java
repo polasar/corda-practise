@@ -40,12 +40,14 @@ public class RepoSchemaV1 extends MappedSchema {
         private String terminationPaymentLeg;
         @Column(name="agent")
         private Party agent;
-        @Column(name = "status")
-        private String status;
+        @Column(name = "accountId")
+        private String accountId;
+        @Column(name = "amount")
+        private Long amount;
 
         public PersistentOper(Party buyer, Party seller, String repoId, String eligibilityCriteriaDataId,
                               UUID linearId, String startDate, String endDate, String terminationPaymentLeg,
-                              Party agent, String status) {
+                              Party agent,String accountId, Long amount) {
             this.buyer = buyer;
             this.seller = seller;
             this.repoId = repoId;
@@ -55,7 +57,8 @@ public class RepoSchemaV1 extends MappedSchema {
             this.endDate = endDate;
             this.terminationPaymentLeg = terminationPaymentLeg;
             this.agent = agent;
-            this.status = status;
+            this.accountId = accountId;
+            this.amount = amount;
         }
 
         public PersistentOper() {
@@ -68,7 +71,8 @@ public class RepoSchemaV1 extends MappedSchema {
             this.endDate = null;
             this.terminationPaymentLeg = null;
             this.agent = null;
-            this.status = null;
+            this.accountId = null;
+            this.amount = null;
         }
 
         public Party getBuyer() {
@@ -107,8 +111,12 @@ public class RepoSchemaV1 extends MappedSchema {
             return agent;
         }
 
-        public String getStatus() {
-            return status;
+        public String getAccountId() {
+            return accountId;
+        }
+
+        public Long getAmount() {
+            return amount;
         }
     }
 }

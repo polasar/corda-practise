@@ -1,6 +1,7 @@
 package com.example.api;
 
 import com.example.Utilities;
+import com.example.flow.CashSetUp;
 import com.example.flow.CustodianInviationFlow;
 import com.example.flow.RepoRequest;
 import com.example.state.Custodian;
@@ -73,7 +74,7 @@ public class RepoApi {
     }
 
     @POST
-    @Path("create-repo")
+    @Path("repo/repo-request")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createIOU(String jsonString){
@@ -132,14 +133,15 @@ public class RepoApi {
     public Response createRepoRequest(String jsonString) {
 
         try {
-
+            Utilities.RepoRequest repoRequest = new Utilities.RepoRequest(jsonString,rpcOps);
             logger.warn(jsonString);
-            Utilities.RepoRequest util = new Utilities.RepoRequest(jsonString);
-            Party counterParty = rpcOps.wellKnownPartyFromX500Name(util.getCounterParty());
-            Party agent = rpcOps.wellKnownPartyFromX500Name(util.getAgent());
+            Party counterParty = rpcOps.wellKnownPartyFromX500Name(repoRequest.getCounterParty());
+            Party agent = rpcOps.wellKnownPartyFromX500Name(repoRequest.getAgent());
             final SignedTransaction signedTx = rpcOps
-                    .startTrackedFlowDynamic(RepoRequest.Initiator.class,counterParty,util.isApplicantIsBuyer(),util.getRepoId(),util.getEligibilityCriteriaDataId(),util.getStartDate(),
-                            util.getEndDate(),util.getTerminationPaymentLeg(),agent,util.getCashInstrumentId(),util.getCashPrice(),util.getUstInstrumentId(),util.getUstPrice(),util.getStatus())
+                    .startTrackedFlowDynamic(RepoRequest.Initiator.class,counterParty,repoRequest.isApplicantIsBuyer(),repoRequest.getRepoId(),
+                            repoRequest.getEligibilityCriteriaDataId(),repoRequest.getStartDate(),repoRequest.getEndDate(),
+                            repoRequest.getTerminationPaymentLeg(),agent,repoRequest.getStatus(),repoRequest.getAccountId(),repoRequest.getAmount()
+                    ,repoRequest.getTotalCashAmount(),repoRequest.getTotalPrincipal(),repoRequest.getTotalNetConsideration(),repoRequest.getPledgeArrayList(),repoRequest.getBorrowerArrayList())
                     .getReturnValue()
                     .get();
 

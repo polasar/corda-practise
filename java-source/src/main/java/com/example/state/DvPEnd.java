@@ -11,9 +11,7 @@ import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class DvPEnd implements LinearState, QueryableState {
@@ -22,22 +20,22 @@ public class DvPEnd implements LinearState, QueryableState {
     private Party seller;
     private Party agent;
     private String dvpId;
-    private Map paymentLegs;
-    private Map deliveryLegs;
+    private List<CollateralData.Pledge> pledgeList;
+    private List<CollateralData.Borrower> borrowerList;
     private UniqueIdentifier linearId;
-    private String settlementDate;
+    private Date settlementDate;
     private String repoId;
 
 
     public DvPEnd(Party buyer, Party seller, String dvpId,
-                    UniqueIdentifier linearId, String settlementDate,Map paymentLegs, Map deliveryLegs, Party agent,String repoId) {
+                    UniqueIdentifier linearId, Date settlementDate,List<CollateralData.Pledge> pledgeList, List<CollateralData.Borrower> borrowerList, Party agent,String repoId) {
         this.buyer = buyer;
         this.seller = seller;
         this.dvpId = dvpId;
         this.linearId = linearId;
         this.settlementDate = settlementDate;
-        this.paymentLegs = paymentLegs;
-        this.deliveryLegs = deliveryLegs;
+        this.pledgeList = pledgeList;
+        this.borrowerList = borrowerList;
         this.agent = agent;
         this.repoId = repoId;
     }
@@ -54,15 +52,7 @@ public class DvPEnd implements LinearState, QueryableState {
         return dvpId;
     }
 
-    public Map getPaymentLegs() {
-        return paymentLegs;
-    }
-
-    public Map getDeliveryLegs() {
-        return deliveryLegs;
-    }
-
-    public String getSettlementDate() {
+    public Date getSettlementDate() {
         return settlementDate;
     }
 
@@ -87,15 +77,8 @@ public class DvPEnd implements LinearState, QueryableState {
     @NotNull
     @Override
     public PersistentState generateMappedObject(MappedSchema schema) {
-        Map<String,Object> paymentLegsString= (Map) paymentLegs;
-        String paymentlegInstrumentId = (String) paymentLegsString.get("instrumentId");
-        Long price = (Long) paymentLegsString.get("price");
-        Map<String,Object>deliveryLegString = (Map) deliveryLegs;
-        String deliveryLegInstrumentId = (String) deliveryLegString.get("instrumentId");
-        Long deliveryLegPrice = (Long) deliveryLegString.get("price");
         if(schema instanceof DvPSchemaV1){
-            return new DvPSchemaV1.PersistentOper(this.buyer,this.seller,this.agent,this.dvpId, this.linearId.getId(),this.settlementDate,paymentlegInstrumentId,price,
-                    deliveryLegInstrumentId,deliveryLegPrice,repoId);
+            return new DvPSchemaV1.PersistentOper(this.buyer,this.seller,this.agent,this.dvpId, this.linearId.getId(),this.settlementDate.toString(),repoId);
         }
         else{
             throw new IllegalArgumentException("unrecognised schema");
@@ -106,5 +89,13 @@ public class DvPEnd implements LinearState, QueryableState {
     @Override
     public Iterable<MappedSchema> supportedSchemas() {
         return ImmutableList.of(new DvPSchemaV1());
+    }
+
+    public List<CollateralData.Pledge> getPledgeList() {
+        return pledgeList;
+    }
+
+    public List<CollateralData.Borrower> getBorrowerList() {
+        return borrowerList;
     }
 }

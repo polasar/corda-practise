@@ -60,7 +60,7 @@ public class Asset implements Contract {
                 // There should be only a single input due to aggregation above
                 final Asset.Cash input = (Cash) inputs.get(0).getState().getData();
 
-                if (!cmd.getSigners().contains(input.getProvider().getOwningKey()))
+                if (!cmd.getSigners().contains(input.getObserver().getOwningKey()))
                     throw new IllegalStateException("Failed requirement: the transaction is signed by the owner of the CP");
 
                 // Check the output CP state is the same as the input state, ignoring the owner field.
@@ -157,10 +157,11 @@ public class Asset implements Contract {
         private String instrumentId;
         private String accountId;
         private String status;
+        private UniqueIdentifier linearId;
 //        public PartyAndReference deposit;
 
         public Cash(AbstractParty provider, AbstractParty owner, AbstractParty observer, Amount<Issued<Currency>> amount,
-                     String instrumentId, String accountId,String status) {
+                     String instrumentId, String accountId,String status, UniqueIdentifier linearId) {
             this.provider = provider;
             this.owner = owner;
             this.observer = observer;
@@ -168,6 +169,7 @@ public class Asset implements Contract {
             this.instrumentId = instrumentId;
             this.accountId = accountId;
             this.status = status;
+            this.linearId = linearId;
 //            this.deposit = deposit;
         }
 
@@ -227,6 +229,12 @@ public class Asset implements Contract {
             return this.owner;
         }
 
+        @NotNull
+        @Override
+        public UniqueIdentifier getLinearId() {
+            return linearId;
+        }
+
         /*@NotNull
         @Override
         public CommandAndState withNewOwner(AbstractParty newOwner) {
@@ -247,7 +255,7 @@ public class Asset implements Contract {
                         this.amount.getToken().getProduct().getCurrencyCode(),
                         this.amount.getToken().getIssuer().getParty().getOwningKey().toString(),
                         this.amount.getToken().getIssuer().getReference().getBytes(),
-                        provider, this.instrumentId);
+                        provider, this.instrumentId, this.linearId.getId());
             } else {
                 throw new IllegalArgumentException("unrecognised schema");
             }
@@ -255,7 +263,7 @@ public class Asset implements Contract {
 
 
         Asset.Cash withoutOwner() {
-            return new Cash(this.provider, this.owner, this.observer, this.amount, this.instrumentId, this.accountId/*,this.deposit*/,this.status);
+            return new Cash(this.provider, this.owner, this.observer, this.amount, this.instrumentId, this.accountId/*,this.deposit*/,this.status,this.linearId);
         }
 
         @NotNull
@@ -273,12 +281,7 @@ public class Asset implements Contract {
             this.status = status;
         }
 
-        @NotNull
-        @Override
-        public UniqueIdentifier getLinearId() {
-            UniqueIdentifier uuid = new UniqueIdentifier();
-            return uuid;
-        }
+
     }
 
 

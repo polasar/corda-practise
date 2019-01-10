@@ -41,25 +41,18 @@ public class RepoAllegeSchemaV1 extends MappedSchema {
         @Column(name = "status")
         private final String status;
         @Column(name = "agent")
+        private final String accountId;
+        @Column(name = "accountId")
+        private final Long amount;
+        @Column(name = "amount")
         private final Party agent;
         @Column(name = "linearId")
         private final UUID linearId;
-        @Column(name = "paymentLegInstrumentId")
-        private String paymentLegInstrumentId;
-        @Column(name = "paymentLegPrice")
-        private Long paymentLegPrice;
-        @Column(name = "deliveryLegInstrumentId")
-        private String deliveryLegInstrumentId;
-        @Column(name = "deliveryLegPrice")
-        private Long deliveryLegPrice;
-        @Column(name = "instrumentId")
-        private String instrumentId;
-        @Column(name = "quantity")
-        private Long quantity;
+
 
         public PersistentOper(Party applicant, Party counterParty, Boolean applicantIsBuyer, String repoId,
                               String eligibilityCriteriaId, String startDate, String endDate, String terminationPaymentLeg,
-                              String status, Party agent, UUID linearId,String paymentLegInstrumentId,Long paymentLegPrice,String deliveryLegInstrumentId, Long deliveryLegPrice,String instrumentId,Long quantity) {
+                              String status,String accountId, Long amount, Party agent, UUID linearId) {
             this.applicant = applicant;
             this.counterParty = counterParty;
             this.applicantIsBuyer = applicantIsBuyer;
@@ -69,14 +62,10 @@ public class RepoAllegeSchemaV1 extends MappedSchema {
             this.endDate = endDate;
             this.terminationPaymentLeg = terminationPaymentLeg;
             this.status = status;
+            this.accountId = accountId;
+            this.amount = amount;
             this.agent = agent;
             this.linearId = linearId;
-            this.paymentLegInstrumentId = paymentLegInstrumentId;
-            this.paymentLegPrice = paymentLegPrice;
-            this.deliveryLegInstrumentId = deliveryLegInstrumentId;
-            this.deliveryLegPrice = deliveryLegPrice;
-            this.instrumentId = instrumentId;
-            this.quantity = quantity;
         }
 
         public PersistentOper() {
@@ -89,14 +78,10 @@ public class RepoAllegeSchemaV1 extends MappedSchema {
             this.endDate = null;
             this.terminationPaymentLeg = null;
             this.status = null;
+            this.accountId = null;
+            this.amount = null;
             this.agent = null;
             this.linearId = null;
-            this.paymentLegInstrumentId = null;
-            this.paymentLegPrice = null;
-            this.deliveryLegInstrumentId = null;
-            this.deliveryLegPrice = null;
-            this.instrumentId =null;
-            this.quantity= null;
         }
 
         public Party getApplicant() {
@@ -131,7 +116,6 @@ public class RepoAllegeSchemaV1 extends MappedSchema {
             return terminationPaymentLeg;
         }
 
-
         public String getStatus() {
             return status;
         }
@@ -144,33 +128,12 @@ public class RepoAllegeSchemaV1 extends MappedSchema {
             return linearId;
         }
 
-        public String getPaymentLegInstrumentId() {
-            return paymentLegInstrumentId;
+        public String getAccountId() {
+            return accountId;
         }
 
-        public Long getPaymentLegPrice() {
-            return paymentLegPrice;
-        }
-
-
-        public String getDeliveryLegInstrumentId() {
-            return deliveryLegInstrumentId;
-        }
-
-        public void setDeliveryLegInstrumentId(String deliveryLegInstrumentId) {
-            this.deliveryLegInstrumentId = deliveryLegInstrumentId;
-        }
-
-        public Long getDeliveryLegPrice() {
-            return deliveryLegPrice;
-        }
-
-        public String getInstrumentId() {
-            return instrumentId;
-        }
-
-        public Long getQuantity() {
-            return quantity;
+        public Long getAmount() {
+            return amount;
         }
     }
 }

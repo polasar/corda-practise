@@ -2,6 +2,8 @@ package com.example.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.example.contract.RepoContract;
+import com.example.state.Collateral;
+import com.example.state.CollateralData;
 import com.example.state.RepoAllege;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.CommandData;
@@ -16,9 +18,7 @@ import net.corda.core.utilities.ProgressTracker.Step;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import java.util.*;
 
 import static com.example.contract.RepoContract.REPO_CONTRACT_ID;
 
@@ -31,15 +31,18 @@ public class RepoRequest {
         private boolean applicantIsBuyer;
         private String repoId;
         private String eligibilityCriteriaDataId;
-        private String startDate;
-        private String endDate;
+        private Date startDate;
+        private Date endDate;
         private String terminationPaymentLeg;
         private Party agent;
-        private String cashInstrumentId;
-        private Long cashPrice;
-        private String ustInstrumentId;
-        private Long ustPrice;
         private String status;
+        private String accountId;
+        private Long amount;
+        private Long totalCashAmount;
+        private Long totalPrincipal;
+        private Long totalNetConsideration;
+        private List<CollateralData.Pledge> pledgeData;
+        private List<CollateralData.Borrower> borrowerData;
 
 
         private final Step GENERATING_TRANSACTION = new Step("Generating transaction based on new Repo.");
@@ -63,8 +66,9 @@ public class RepoRequest {
 
 
         public Initiator(Party counterParty, boolean applicantIsBuyer, String repoId, String eligibilityCriteriaDataId,
-                         String startDate, String endDate, String terminationPaymentLeg, Party agent,
-                         String cashInstrumentId, Long cashPrice, String ustInstrumentId, Long ustPrice, String status) {
+                         Date startDate, Date endDate, String terminationPaymentLeg, Party agent,
+                         String status,String accountId, Long amount, Long totalCashAmount, Long totalPrincipal, Long totalNetConsideration,
+                         List<CollateralData.Pledge> pledgeData, List<CollateralData.Borrower> borrowerData) {
             this.counterParty = counterParty;
             this.applicantIsBuyer = applicantIsBuyer;
             this.repoId = repoId;
@@ -73,11 +77,14 @@ public class RepoRequest {
             this.endDate = endDate;
             this.terminationPaymentLeg = terminationPaymentLeg;
             this.agent = agent;
-            this.cashInstrumentId = cashInstrumentId;
-            this.cashPrice = cashPrice;
-            this.ustInstrumentId = ustInstrumentId;
-            this.ustPrice = ustPrice;
             this.status = status;
+            this.accountId = accountId;
+            this.amount = amount;
+            this.totalCashAmount = totalCashAmount;
+            this.totalPrincipal = totalPrincipal;
+            this.totalNetConsideration = totalNetConsideration;
+            this.pledgeData = pledgeData;
+            this.borrowerData = borrowerData;
         }
 
         @Override
@@ -93,29 +100,20 @@ public class RepoRequest {
 
             // We create the transaction components.
 
-            UniqueIdentifier uniqueIdentifier = new UniqueIdentifier("12",UUID.randomUUID());
+            UniqueIdentifier uniqueIdentifier = new UniqueIdentifier("R1",UUID.randomUUID());
             try {
                 Statement statement = getServiceHub().jdbcSession().createStatement();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            //Delivery legs
-            LinkedHashMap deliveryLegsLocal = new LinkedHashMap();
-            deliveryLegsLocal.put("provider",agent);
-            deliveryLegsLocal.put("instrumentId",cashInstrumentId );
-            deliveryLegsLocal.put("price",cashPrice);
 
-            //Payment legs
-            LinkedHashMap paymentLegsLocal = new LinkedHashMap();
-            paymentLegsLocal.put("provider",agent);
-            paymentLegsLocal.put("instrumentId",ustInstrumentId);
-            paymentLegsLocal.put("price",ustPrice);
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
             String concatRepoID = repoId.concat(timeStamp);
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
             RepoAllege outputState = new RepoAllege(getOurIdentity(),counterParty,applicantIsBuyer,concatRepoID,eligibilityCriteriaDataId,
-                    new UniqueIdentifier(),startDate,endDate,terminationPaymentLeg,agent,deliveryLegsLocal,paymentLegsLocal,status,ustInstrumentId,ustPrice);
-
+                    uniqueIdentifier,startDate,endDate,terminationPaymentLeg,agent,status,this.accountId,this.amount);
+            //Collateral States
+            Collateral collateral = new Collateral(totalCashAmount,totalPrincipal,totalNetConsideration,pledgeData,borrowerData,uniqueIdentifier,getOurIdentity(),agent);
             //Initialize commandData
             progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
             CommandData cmdType = new RepoContract.Commands.Issue();
@@ -134,8 +132,8 @@ public class RepoRequest {
             final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
             // Finalising the transaction.
-             subFlow(new FinalityFlow(signedTx));
-             return null;
+           return  subFlow(new FinalityFlow(signedTx));
+
         }
     }
 

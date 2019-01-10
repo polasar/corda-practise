@@ -21,20 +21,18 @@ public class RepoAllege implements LinearState, QueryableState {
     private String repoId;
     private String eligibilityCriteriaDataId;
     private final UniqueIdentifier linearId;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     private String terminationPaymentLeg;
-    private Map<String,Object> deliveryLegs;
-    private Map<String,Object> paymentLegs;
     private Party agent;
     private String status;
-    private String instrumentId;
-    private Long quantity;
+    private String accountId;
+    private Long amount;
 
 
     public RepoAllege(Party applicant, Party counterParty, boolean applicantIsBuyer, String repoId, String eligibilityCriteriaDataId,
-                      UniqueIdentifier linearId, String startDate, String endDate, String terminationPaymentLeg,
-                      Party agent, Map deliveryLegs, Map paymentLegs, String status,String instrumentId, Long quantity) {
+                      UniqueIdentifier linearId, Date startDate, Date endDate, String terminationPaymentLeg,
+                      Party agent, String status,String accountId, Long amount) {
         this.applicant = applicant;
         this.counterParty = counterParty;
         this.applicantIsBuyer = applicantIsBuyer;
@@ -45,11 +43,9 @@ public class RepoAllege implements LinearState, QueryableState {
         this.endDate = endDate;
         this.terminationPaymentLeg = terminationPaymentLeg;
         this.agent = agent;
-        this.deliveryLegs = deliveryLegs;
-        this.paymentLegs = paymentLegs;
         this.status = status;
-        this.instrumentId = instrumentId;
-        this.quantity = quantity;
+        this.accountId = accountId;
+        this.amount = amount;
     }
 
 
@@ -77,11 +73,11 @@ public class RepoAllege implements LinearState, QueryableState {
         return linearId;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
@@ -91,14 +87,6 @@ public class RepoAllege implements LinearState, QueryableState {
 
     public Party getAgent() {
         return agent;
-    }
-
-    public Map<String,Object> getDeliveryLegs(){
-        return  deliveryLegs;
-    }
-
-    public  Map<String,Object> getPaymentLegs(){
-        return  paymentLegs;
     }
 
     public String getStatus(){
@@ -118,23 +106,15 @@ public class RepoAllege implements LinearState, QueryableState {
     @NotNull
     @Override
     public PersistentState generateMappedObject(MappedSchema schema) {
-        Map<String, Object> paymentLegs = this.paymentLegs;
 
-        String paymentLegInstrumentId = (String) paymentLegs.get("instrumentId");
-        Long paymentLegPrice = (Long) paymentLegs.get("price");
-        Map<String,Object> deliveryLegString = (Map) deliveryLegs;
+            if (schema instanceof RepoAllegeSchemaV1) {
+                return new RepoAllegeSchemaV1.PersistentOper(this.applicant, this.counterParty, this.applicantIsBuyer, this.repoId,
+                        this.eligibilityCriteriaDataId, this.startDate.toString(), this.endDate.toString(), this.terminationPaymentLeg,
+                        this.status, this.accountId,this.amount, this.agent, this.linearId.getId());
+            } else {
+                throw new IllegalArgumentException("Unrecognised schema exception");
+            }
 
-        String deliveryLegInstrumentId = (String) deliveryLegString.get("instrumentId");
-        Long deliveryLegPrice = (Long) deliveryLegString.get("price");
-
-        if(schema instanceof RepoAllegeSchemaV1){
-            return new RepoAllegeSchemaV1.PersistentOper(this.applicant,this.counterParty,this.applicantIsBuyer,this.repoId,
-                    this.eligibilityCriteriaDataId,this.startDate,this.endDate,this.terminationPaymentLeg,
-                    this.status,this.agent,this.linearId.getId(),paymentLegInstrumentId,paymentLegPrice,deliveryLegInstrumentId,deliveryLegPrice,this.instrumentId,this.quantity);
-        }
-        else{
-            throw new IllegalArgumentException("Unrecognised schema exception");
-        }
     }
 
     @NotNull
@@ -143,11 +123,11 @@ public class RepoAllege implements LinearState, QueryableState {
         return ImmutableList.of(new RepoAllegeSchemaV1());
     }
 
-    public String getInstrumentId() {
-        return instrumentId;
+    public String getAccountId() {
+        return accountId;
     }
 
-    public Long getQuantity() {
-        return quantity;
+    public Long getAmount() {
+        return amount;
     }
 }

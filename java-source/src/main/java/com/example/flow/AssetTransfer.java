@@ -164,7 +164,7 @@ public class AssetTransfer {
 
         private Asset.Cash deriveState(TransactionState<Asset.Cash> templateState, Amount amount, AbstractParty owner,String accountId) {
             Asset.Cash data = templateState.getData();
-            Asset.Cash assetCash = new Asset.Cash(data.getProvider(), owner,data.getObserver(),amount,data.getInstrumentId(),accountId/*,data.getDeposit()*/,"");
+            Asset.Cash assetCash = new Asset.Cash(data.getProvider(), owner,data.getObserver(),amount,data.getInstrumentId(),accountId/*,data.getDeposit()*/,"Settled", data.getLinearId());
             return assetCash;
         }
 

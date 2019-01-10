@@ -31,18 +31,18 @@ public class BondSchemaV1 extends MappedSchema {
         @Column(name = "accountId")
         private String accountId;
         @Column(name = "amount")
-        private Long amount;
+        private Long quantity;
         @Column(name = "operator")
         private Party operator;
 
 
-        public PersistentOper(Party provider, Party owner, String instrumentId,String omniBusAccountId, String accountId, Long amount,Party operator) {
+        public PersistentOper(Party provider, Party owner, String instrumentId,String omniBusAccountId, String accountId, Long quantity,Party operator) {
             this.provider = provider;
             this.owner = owner;
             this.instrumentId = instrumentId;
             this.omniBusAccountId = omniBusAccountId;
             this.accountId = accountId;
-            this.amount = amount;
+            this.quantity = quantity;
             this.operator = operator;
         }
 
@@ -52,7 +52,7 @@ public class BondSchemaV1 extends MappedSchema {
             this.instrumentId = null;
             this.omniBusAccountId = null;
             this.accountId = null;
-            this.amount = null;
+            this.quantity = null;
             this.operator =null;
         }
 
@@ -72,8 +72,8 @@ public class BondSchemaV1 extends MappedSchema {
             return accountId;
         }
 
-        public Long getAmount() {
-            return amount;
+        public Long getQuantity() {
+            return quantity;
         }
 
         public Party getOperator() {

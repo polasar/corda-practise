@@ -13,21 +13,21 @@ import java.util.*;
 
 
 
-public  class Bond implements LinearState, QueryableState {
+public  class AssetIssuanceRequest implements LinearState, QueryableState {
         private Party provider;
         private Party operator;
         private Party owner;
-        private Long amount;
+        private Long quantity;
         private String instrumentId;
         private String omniBusAccountId;
         private String accountId;
         private String status;
 
-    public Bond(Party provider,Party operator, Party owner, Long amount, String instrumentId,String omniBusAccountId, String accountId, String status) {
+    public AssetIssuanceRequest(Party provider, Party operator, Party owner, Long quantity, String instrumentId, String omniBusAccountId, String accountId, String status) {
         this.provider = provider;
         this.operator =operator;
         this.owner = owner;
-        this.amount = amount;
+        this.quantity = quantity;
         this.instrumentId = instrumentId;
         this.omniBusAccountId = omniBusAccountId;
         this.accountId = accountId;
@@ -46,7 +46,7 @@ public  class Bond implements LinearState, QueryableState {
                         this.instrumentId,
                         this.omniBusAccountId,
                         this.accountId,
-                        this.amount,
+                        this.quantity,
                         this.operator
                 );
             } else {
@@ -90,8 +90,8 @@ public  class Bond implements LinearState, QueryableState {
         return owner;
     }
 
-    public Long getAmount(){
-        return amount;
+    public Long getQuantity(){
+        return quantity;
     }
 
     public String getInstrumentId(){

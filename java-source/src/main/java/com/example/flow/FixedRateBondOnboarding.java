@@ -2,7 +2,6 @@ package com.example.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.example.schema.AccountSchemaV1;
-import com.example.schema.BondSchemaV1;
 import com.example.state.*;
 import com.google.common.collect.ImmutableSet;
 import net.corda.core.contracts.*;
@@ -126,36 +125,35 @@ public class FixedRateBondOnboarding {
             Account accountData = accountStates.getState().getData();
 
             QueryCriteria generalCriteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-            List<StateAndRef<Bond>> assetOnboardRequests = vaultService.queryBy(Bond.class, generalCriteria).getStates();
+            List<StateAndRef<AssetIssuanceRequest>> assetOnboardRequests = vaultService.queryBy(AssetIssuanceRequest.class, generalCriteria).getStates();
 
 
             if(accountStates!= null && omniAccountStates!= null) {
                 for (int i = 0; i < assetOnboardRequests.size(); i++) {
 
-                    StateAndRef<Bond> bondStateAndRef = assetOnboardRequests.get(i);
-                    Bond bondData = bondStateAndRef.getState().getData();
-                    if (me.equals(bondData.getProvider())&& bondData.getOmniBusAccountId().equals(omniAccountData.getAccountId())&& bondData.getProvider().equals(omniAccountData.getOwner())
-                    && bondData.getProvider().equals(accountData.getProvider()) && bondData.getOwner().equals(accountData.getOwner())&& bondData.getAccountId().equals(accountData.getAccountId())
-                    && bondData.getStatus().equals("Asset Onboarding Request")) {
-                        // TODO: 13-12-2018 check for the ststus
+                    StateAndRef<AssetIssuanceRequest> bondStateAndRef = assetOnboardRequests.get(i);
+                    AssetIssuanceRequest assetIssuanceRequestData = bondStateAndRef.getState().getData();
+                    if (me.equals(assetIssuanceRequestData.getProvider())&& assetIssuanceRequestData.getOmniBusAccountId().equals(omniAccountData.getAccountId())&& assetIssuanceRequestData.getProvider().equals(omniAccountData.getOwner())
+                    && assetIssuanceRequestData.getProvider().equals(accountData.getProvider()) && assetIssuanceRequestData.getOwner().equals(accountData.getOwner())&& assetIssuanceRequestData.getAccountId().equals(accountData.getAccountId())
+                    && assetIssuanceRequestData.getStatus().equals("Asset Onboarding Request")) {
                         //Create transaction components
-                        Command command = new Command(new Asset.Commands.Issue(), Arrays.asList(getOurIdentity().getOwningKey(), bondData.getOperator().getOwningKey(), bondData.getOwner().getOwningKey()));
-                        PartyAndReference partyAndReference = new PartyAndReference(bondData.getOperator(), OpaqueBytes.of(defaultRef));
-                        Amount<Currency> amount = DOLLARS(bondData.getAmount());
-                         Amount<Issued<Currency>> issuedAmount = issuedBy(DOLLARS(bondData.getAmount()), bondData.getOperator().ref(defaultRef));
+                        Command command = new Command(new Asset.Commands.Issue(), Arrays.asList(getOurIdentity().getOwningKey(), assetIssuanceRequestData.getOperator().getOwningKey(), assetIssuanceRequestData.getOwner().getOwningKey()));
+                        PartyAndReference partyAndReference = new PartyAndReference(assetIssuanceRequestData.getOperator(), OpaqueBytes.of(defaultRef));
+                        Amount<Currency> amount = DOLLARS(assetIssuanceRequestData.getQuantity());
+                         Amount<Issued<Currency>> issuedAmount = issuedBy(DOLLARS(assetIssuanceRequestData.getQuantity()), assetIssuanceRequestData.getOperator().ref(defaultRef));
                         Issued issuerAndToken = new Issued(partyAndReference, amount.getToken());
 //                        Amount issuedAmount = new Amount(amount.getQuantity(), issuerAndToken);
-                        bondData.setStatus("Asset Onboarded");
-                        Asset.Cash cashState = new Asset.Cash(getOurIdentity(), bondData.getOwner(), bondData.getOperator(), issuedAmount,
-                                bondData.getInstrumentId(), bondData.getAccountId(), bondData.getStatus());
+                        assetIssuanceRequestData.setStatus("Asset Onboarded");
+                        Asset.Cash cashState = new Asset.Cash(getOurIdentity(), assetIssuanceRequestData.getOwner(), assetIssuanceRequestData.getOperator(), issuedAmount,
+                                assetIssuanceRequestData.getInstrumentId(), assetIssuanceRequestData.getAccountId(), assetIssuanceRequestData.getStatus(), assetIssuanceRequestData.getLinearId());
                         TransactionBuilder transactionBuilder = new TransactionBuilder(notary)
                                 .addInputState(bondStateAndRef)
                                 .addOutputState(cashState, Asset.PROGRAM_ID)
                                 .addCommand(command);
 
                         SignedTransaction signedTransaction = getServiceHub().signInitialTransaction(transactionBuilder, getOurIdentity().getOwningKey());
-                        FlowSession issuerSignature = initiateFlow(bondData.getOperator());
-                        FlowSession ownerSignature = initiateFlow(bondData.getOwner());
+                        FlowSession issuerSignature = initiateFlow(assetIssuanceRequestData.getOperator());
+                        FlowSession ownerSignature = initiateFlow(assetIssuanceRequestData.getOwner());
                         final SignedTransaction fullySignedTx = subFlow(
                                 new CollectSignaturesFlow(signedTransaction, ImmutableSet.of(issuerSignature, ownerSignature), CollectSignaturesFlow.Companion.tracker()));
                         transactionBuilder.verify(getServiceHub());

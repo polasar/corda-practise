@@ -2,22 +2,14 @@ package com.example.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.example.contract.RepoContract;
-import com.example.schema.AccountSchemaV1;
-import com.example.schema.BondSchemaV1;
-import com.example.schema.CustodianSchemaV1;
-import com.example.state.Account;
-import com.example.state.Bond;
+import com.example.state.AssetIssuanceRequest;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.CommandData;
-import net.corda.core.contracts.StateAndRef;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-
-import java.lang.reflect.Field;
-import java.util.List;
 
 import static com.example.contract.RepoContract.REPO_CONTRACT_ID;
 
@@ -81,7 +73,7 @@ public class AssetOnboardingRequest {
             // We create the transaction components.
             if(me.equals(owner)) {
                 progressTracker.setCurrentStep(GENERATING_TRANSACTION);
-                Bond bondState = new Bond(provider,operator, getOurIdentity(), this.quantity, this.instrumentId,this.omniBusAccountId, this.ownerAccountId, this.status);
+                AssetIssuanceRequest assetIssuanceRequestState = new AssetIssuanceRequest(provider,operator, getOurIdentity(), this.quantity, this.instrumentId,this.omniBusAccountId, this.ownerAccountId, this.status);
 
                 //Initialize commandData
                 progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
@@ -91,7 +83,7 @@ public class AssetOnboardingRequest {
                 // We create a transaction builder and add the components.
                 progressTracker.setCurrentStep(SIGNING_TRANSACTION);
                 final TransactionBuilder txBuilder = new TransactionBuilder(notary)
-                        .addOutputState(bondState, REPO_CONTRACT_ID)
+                        .addOutputState(assetIssuanceRequestState, REPO_CONTRACT_ID)
                         .addCommand(cmd);
                 //Verify the transaction
                 txBuilder.verify(getServiceHub());

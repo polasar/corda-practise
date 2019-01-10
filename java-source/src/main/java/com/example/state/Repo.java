@@ -13,6 +13,7 @@ import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class Repo implements LinearState, QueryableState {
@@ -22,15 +23,16 @@ public class Repo implements LinearState, QueryableState {
     private String repoId;
     private String eligibilityCriteriaDataId;
     private final UniqueIdentifier linearId;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     private String terminationPaymentLeg;
     private Party agent;
-    private String status;
+    private String accountId;
+    private Long amount;
 
 
     public Repo(Party buyer, Party seller, String repoId, String eligibilityCriteriaDataId,
-                UniqueIdentifier linearId, String startDate, String endDate, String terminationPaymentLeg, Party agent, String status) {
+                UniqueIdentifier linearId, Date startDate, Date endDate, String terminationPaymentLeg, Party agent,String accountId, Long amount) {
         this.buyer = buyer;
         this.seller = seller;
         this.repoId = repoId;
@@ -40,7 +42,8 @@ public class Repo implements LinearState, QueryableState {
         this.endDate = endDate;
         this.terminationPaymentLeg = terminationPaymentLeg;
         this.agent = agent;
-        this.status = status;
+        this.accountId = accountId;
+        this.amount = amount;
     }
 
 
@@ -48,7 +51,7 @@ public class Repo implements LinearState, QueryableState {
     @NotNull
     @Override
     public UniqueIdentifier getLinearId() {
-        return new UniqueIdentifier(repoId,linearId.getId());
+        return linearId;
     }
 
     @NotNull
@@ -77,11 +80,11 @@ public class Repo implements LinearState, QueryableState {
         return eligibilityCriteriaDataId;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
@@ -93,9 +96,6 @@ public class Repo implements LinearState, QueryableState {
         return agent;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
     @NotNull
     @Override
@@ -103,8 +103,8 @@ public class Repo implements LinearState, QueryableState {
         if(schema instanceof RepoSchemaV1)
         {
             return new RepoSchemaV1.PersistentOper(this.buyer,this.seller,this.repoId,this.eligibilityCriteriaDataId,
-                    this.linearId.getId(),this.startDate,this.endDate,this.terminationPaymentLeg,
-                    this.agent,this.status);
+                    this.linearId.getId(),this.startDate.toString(),this.endDate.toString(),this.terminationPaymentLeg,
+                    this.agent,getAccountId(),getAmount());
         }
         else{
             throw new IllegalArgumentException("unrecognised schema");
@@ -115,5 +115,13 @@ public class Repo implements LinearState, QueryableState {
     @Override
     public Iterable<MappedSchema> supportedSchemas() {
         return ImmutableList.of(new RepoSchemaV1()) ;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public Long getAmount() {
+        return amount;
     }
 }

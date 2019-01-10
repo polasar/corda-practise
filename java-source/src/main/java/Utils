@@ -53,6 +53,14 @@ run vaultQuery contractStateType: "com.example.state.RepoState"
 
 start RepodealApprover$Initiator refId: "refid123456789"
 
+start FixedRateBondOnboarding$Initiator instrumentId: "9801R89", ownerAccountId: "SOC100", issuer: "O=BR,L=Paris,C=FR"
+
+start FixedRateBondOnboarding$Initiator instrumentId: "9801R85", ownerAccountId: "NAT100", issuer: "O=BR,L=Paris,C=FR"
+
+start AssetTransfer owner: "O=SocGen,L=London,C=GB", counterParty: "O=Natixis,L=New York,C=US"
+
+start FixedRateBondSetUp provider: "O=Custodian,L=Paris,C=FR", instrumentId: "9801R89", observer: "O=BR,L=Paris,C=FR", couponDataTriggered: "2", cusip: "9801R89", isIn: "isInData", rate: 10.0, denomination: 100.0, paymentLag: "2", couponDate: "11/13/2018"
+
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 Tokens
@@ -72,34 +80,22 @@ start MarketParticipantInvitation participant: "O=Natixis,L=New York,C=US", prov
 
 start CustodianInviationFlow provider: "O=Custodian,L=Paris,C=FR", agent: "O=BR,L=Paris,C=FR", status: "Custodian Invitation"
 
-start CashSetUp instrumentId: "USD", currency: "USD", provider: "O=Custodian,L=Paris,C=FR", observer: "O=BR,L=Paris,C=FR"
-
 start FixedRateBondOnboarding$Initiator omniBusProvider: "O=Custodian,L=Paris,C=FR", omniBusOwner: "O=Custodian,L=Paris,C=FR", omniBusAccountId: "OMNIACC1", accountProvider: "O=Custodian,L=Paris,C=FR", accountOwner: "O=SocGen,L=London,C=GB", accountId: "SOC100"
 
 start FixedRateBondOnboarding$Initiator omniBusProvider: "O=Custodian,L=Paris,C=FR", omniBusOwner: "O=Custodian,L=Paris,C=FR", omniBusAccountId: "OMNIACC1", accountProvider: "O=Custodian,L=Paris,C=FR", accountOwner: "O=Natixis,L=New York,C=US", accountId: "NAT100"
 
-
-start FixedRateBondOnboardingApproval instrumentId: "9801R87"
-
-start FixedRateBondOnboarding$Initiator instrumentId: "9801R89", ownerAccountId: "SOC100", issuer: "O=BR,L=Paris,C=FR"
-
-start FixedRateBondOnboarding$Initiator instrumentId: "9801R85", ownerAccountId: "NAT100", issuer: "O=BR,L=Paris,C=FR"
-
-
-
-
-start FixedRateBondSetUp provider: "O=Custodian,L=Paris,C=FR", instrumentId: "9801R89", observer: "O=BR,L=Paris,C=FR", couponDataTriggered: "2", cusip: "9801R89", isIn: "isInData", rate: 10.0, denomination: 100.0, paymentLag: "2", couponDate: "11/13/2018"
-
-start AssetTransfer owner: "O=SocGen,L=London,C=GB", counterParty: "O=Natixis,L=New York,C=US"
-
 start AssetOnboardingRequest owner: "O=SocGen,L=London,C=GB", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 1000, instrumentId: "9801R89", ownerAccountId: "SOC100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
 
-start AssetOnboardingRequest owner: "O=Natixis,L=New York,C=US", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 1000, instrumentId: "9801R85", ownerAccountId: "NAT100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
+start AssetOnboardingRequest owner: "O=SocGen,L=London,C=GB", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 3000, instrumentId: "9801R83", ownerAccountId: "SOC100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
+
+start AssetOnboardingRequest owner: "O=Natixis,L=New York,C=US", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 4000, instrumentId: "9801R89", ownerAccountId: "NAT100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
+
+start AssetOnboardingRequest owner: "O=Natixis,L=New York,C=US", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 4000, instrumentId: "9801R83", ownerAccountId: "NAT100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
 
 
 run vaultQuery contractStateType: "com.example.state.Account"
 run vaultQuery contractStateType: "com.example.state.FixedRateBond"
-run vaultQuery contractStateType: "com.example.state.Bond"
+run vaultQuery contractStateType: "com.example.state.AssetIssuanceRequest"
 run vaultQuery contractStateType: "com.example.state.Asset$Cash"
 run vaultQuery contractStateType: "com.example.state.Custodian$Test"
 run vaultQuery contractStateType: "com.example.state.Custodian$Test1"
@@ -110,12 +106,12 @@ net.corda.finance.contracts.asset.Cash
 
 start RepodealApprover$Initiator refId: "TA20185181526638186783"
 
-start RepoRequest$Initiator counterParty: "O=Natixis,L=New York,C=US", applicantIsBuyer: true, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 1000.0, ustInstrumentId: "9801R89", ustPrice: 1000.0, status: "UNMATCHED"
+start RepoRequest$Initiator counterParty: "O=Natixis,L=New York,C=US", applicantIsBuyer: true, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 200.0, ustInstrumentId: "9801R89", ustPrice: 200.0, status: "UNMATCHED"
 
-start RepoRequest$Initiator counterParty: "O=Natixis,L=New York,C=US", applicantIsBuyer: false, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 1000.0, ustInstrumentId: "9801R89", ustPrice: 1000.0, status: "UNMATCHED"
+start RepoRequest$Initiator counterParty: "O=Natixis,L=New York,C=US", applicantIsBuyer: false, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 200.0, ustInstrumentId: "9801R89", ustPrice: 200.0, status: "UNMATCHED"
 
 
-start RepoRequest$Initiator counterParty: "O=SocGen,L=London,C=GB", applicantIsBuyer: false, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 1000.0, ustInstrumentId: "9801R89", ustPrice: 1000.0, status: "UNMATCHED"
+start RepoRequest$Initiator counterParty: "O=SocGen,L=London,C=GB", applicantIsBuyer: false, repoId: "R1", eligibilityCriteriaDataId: "E1", startDate: "01/01/2000", endDate: "01/01/2010", terminationPaymentLeg: "2", agent: "O=Custodian,L=Paris,C=FR", cashInstrumentId: "9801R85", cashPrice: 200.0, ustInstrumentId: "9801R89", ustPrice: 200.0, status: "UNMATCHED"
 
 
 
@@ -131,9 +127,9 @@ run vaultQuery contractStateType: "com.example.state.RepoAllege"
 run vaultQuery contractStateType: "com.example.state.DvPStart"
 run vaultQuery contractStateType: "com.example.state.DvPEnd"
 
-start Settlement repoId: "R120190102_135350"
+start Settlement repoId: "R120190109_121819", uuid: 065f92b2-2404-4c1a-921f-2a6714b16bae
 
-start RepoMatch$Initiator custodian: "O=Custodian,L=Paris,C=FR"
+start RepoMatch$Initiator operator: "O=BR,L=Paris,C=FR"
 
 "R120181225_214959",
 

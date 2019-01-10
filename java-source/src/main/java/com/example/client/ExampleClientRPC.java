@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Demonstration of using the CordaRPCClient to connect to a Corda Node and
- * steam some Bond data from the node.
+ * steam some AssetIssuanceRequest data from the node.
  */
 public class ExampleClientRPC {
     private static final Logger logger = LoggerFactory.getLogger(ExampleClientRPC.class);

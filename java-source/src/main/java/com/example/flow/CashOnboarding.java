@@ -86,7 +86,8 @@ public class CashOnboarding {
                 // Amount<Issued<Currency>> issuedAmount = issuedBy(DOLLARS(quantity), owner.ref(defaultRef));
                 Issued issuerAndToken = new Issued(partyAndReference, amount.getToken());
                 Amount issuedAmount = new Amount(amount.getQuantity(), issuerAndToken);
-                Asset.Cash cashState = new Asset.Cash(this.provider,this.owner,this.observer,issuedAmount,this.instrumentId,this.accountId/*,owner.ref(defaultRef)*/,this.status);
+                UniqueIdentifier uniqueIdentifier = new UniqueIdentifier();
+                Asset.Cash cashState = new Asset.Cash(this.provider,this.owner,this.observer,issuedAmount,this.instrumentId,this.accountId/*,owner.ref(defaultRef)*/,this.status,uniqueIdentifier);
                 TransactionBuilder transactionBuilder = new TransactionBuilder(notary)
                         .addOutputState(cashState, Asset.PROGRAM_ID)
                         .addCommand(command);

@@ -9,6 +9,7 @@ import net.corda.core.serialization.CordaSerializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.UUID;
 
 @CordaSerializable
 public class CashSchemaV1 extends MappedSchema {
@@ -34,6 +35,8 @@ public class CashSchemaV1 extends MappedSchema {
         private AbstractParty provider;
         @Column(name = "instrument")
         private String instrument;
+        @Column(name = "linearId")
+        private final UUID linearId;
 
 
         public PersistentOper() {
@@ -45,9 +48,10 @@ public class CashSchemaV1 extends MappedSchema {
             this.bytes = null;
             this.provider =null;
             this.instrument=null;
+            this.linearId =null ;
         }
 
-        public PersistentOper(AbstractParty owner, Long quantity, String currencyCode, String owningKey, byte[] bytes, AbstractParty provider, String instrument){
+        public PersistentOper(AbstractParty owner, Long quantity, String currencyCode, String owningKey, byte[] bytes, AbstractParty provider, String instrument,UUID linearId){
             this.owner = owner;
             this.quantity= quantity;
             this.currencyCode=currencyCode;
@@ -55,6 +59,7 @@ public class CashSchemaV1 extends MappedSchema {
             this.bytes = bytes;
             this.provider = provider;
             this.instrument = instrument;
+            this.linearId = linearId;
         }
 
 
@@ -84,6 +89,10 @@ public class CashSchemaV1 extends MappedSchema {
 
         public String getInstrument() {
             return instrument;
+        }
+
+        public final UUID getLinearId() {
+            return linearId;
         }
     }
 }

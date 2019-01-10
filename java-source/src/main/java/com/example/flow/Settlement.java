@@ -5,6 +5,7 @@ import com.example.schema.CashSchemaV1;
 import com.example.schema.DvPSchemaV1;
 import com.example.schema.RepoSchemaV1;
 import com.example.state.Asset;
+import com.example.state.CollateralData;
 import com.example.state.DvPStart;
 import com.example.state.Repo;
 import com.google.common.collect.ImmutableSet;
@@ -33,13 +34,12 @@ public class Settlement {
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction>{
         private String repoId;
-        private Party owner;
-        private Party counterParty;
-        private final byte[] cashdefaultRef = {1};
-        private final byte[] defaultRef = {123};
+        private UUID uuid;
 
-        public Initiator(String repoId) {
+        public Initiator(String repoId, UUID uuid)
+        {
             this.repoId =repoId;
+            this.uuid =uuid;
         }
 
         private final ProgressTracker.Step GENERATE_TRANSACTION = new ProgressTracker.Step("Generate transaction based on new repo");
@@ -77,18 +77,22 @@ public class Settlement {
             VaultService vaultService = getServiceHub().getVaultService();
             Field repoId =null;
             Field dvpRepoId = null;
+            Field uuid = null;
 
                 // Get the repo, dvp legs,asset,account for asset transfer
                 QueryCriteria criteria1 = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
                 QueryCriteria criteria12 = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
                 try {
                     repoId = RepoSchemaV1.PersistentOper.class.getDeclaredField("repoId");
+                    uuid = RepoSchemaV1.PersistentOper.class.getDeclaredField("linearId");
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 }
                 CriteriaExpression isrepoId = Builder.equal(repoId, this.repoId);
                 QueryCriteria lenderCriteria = new QueryCriteria.VaultCustomQueryCriteria(isrepoId);
-                QueryCriteria criteria = criteria1.and(lenderCriteria);
+                CriteriaExpression linearIdCheck = Builder.equal(uuid, this.uuid);
+                QueryCriteria lenderCriteriaForUUID = new QueryCriteria.VaultCustomQueryCriteria(linearIdCheck);
+                QueryCriteria criteria = criteria1.and(lenderCriteria.and(lenderCriteriaForUUID));
 
                 /*
                 * REPO states
@@ -100,13 +104,16 @@ public class Settlement {
                 //DvP
                 try {
                     dvpRepoId = DvPSchemaV1.PersistentOper.class.getDeclaredField("repoId");
+                    uuid = DvPSchemaV1.PersistentOper.class.getDeclaredField("linearId");
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 }
 
                 CriteriaExpression isDvPRepoId = Builder.equal(dvpRepoId, this.repoId);
                 QueryCriteria dvpCriteria = new QueryCriteria.VaultCustomQueryCriteria(isDvPRepoId);
-                QueryCriteria dvpCriteriaData = criteria12.and(dvpCriteria);
+                CriteriaExpression linearIdCheckForDvP = Builder.equal(uuid, this.uuid);
+                QueryCriteria lenderCriteriaUUID = new QueryCriteria.VaultCustomQueryCriteria(linearIdCheckForDvP);
+                QueryCriteria dvpCriteriaData = criteria12.and(lenderCriteriaUUID.and(dvpCriteria));
 
                 /*
                 * DVP Start states
@@ -127,32 +134,45 @@ public class Settlement {
                 PAYMENT AND DELIVERY LEGS
                  */
 
-                Map<String, Object> paymentLegs = dvpStates.getState().getData().getPaymentLegs();
-                String paymentInstrumentId = (String) paymentLegs.get("instrumentId");
-                Long paymentPrice = (Long) paymentLegs.get("price");
-                Map<String, Object> deliveryLegs = dvpStates.getState().getData().getDeliveryLegs();
-                String deliveryLegInstrumentId = (String) deliveryLegs.get("instrumentId");
-                Long deliveryLegPrice = (Long) deliveryLegs.get("price");
+            List<CollateralData.Pledge> pledgeList = dvpStates.getState().getData().getPledgeList();
+            List<CollateralData.Borrower> borrowerList = dvpStates.getState().getData().getBorrowerList();
+                for(int i=0, j=0; i<pledgeList.size() && j<borrowerList.size(); i++,j++) {
+                    CollateralData.Pledge pledge = pledgeList.get(i);
+                    String paymentInstrumentId = pledge.getInstrumentId();
+                    Long paymentPrice = pledge.getCurrentQuantity();
+                    CollateralData.Borrower borrower = borrowerList.get(j);
+                    String deliveryLegInstrumentId = borrower.getInstrumentId();
+                    Long deliveryLegPrice = borrower.getCurrentQuantity();
                 /*
 
                 ASSET TRANSFER FLOW STARTS
                  */
-                TransactionBuilder tx = AssetTransfer(buyer, seller, paymentInstrumentId, deliveryLegInstrumentId, paymentPrice, deliveryLegPrice,transactionBuilder);
+                    transactionBuilder = AssetTransfer(buyer, seller, paymentInstrumentId, deliveryLegInstrumentId, paymentPrice, deliveryLegPrice, transactionBuilder);
+
+                }
+                /*
+
+            CREATE MOVE COMMAND WITH OWNER, COUNTERPARTY,CUSTODIAN SIGNATURES
+
+             */
+            Command command = new Command(new Asset.Commands.Move(), Arrays.asList(getOurIdentity().getOwningKey(), buyer.getOwningKey(), seller.getOwningKey()));
+
+            /*
 
                 /*
 
                 CONSUME DVP-START AND REPO STATES
                  */
 
-                tx.addInputState(dvpStates);
-                tx.addInputState(buyerStates);
+                transactionBuilder.addInputState(dvpStates);
+                transactionBuilder.addCommand(command);
 
                 /*
 
                 SIGNING THE TRANSACTION
                  */
 
-                SignedTransaction signedTransaction = getServiceHub().signInitialTransaction(tx,getOurIdentity().getOwningKey());
+                SignedTransaction signedTransaction = getServiceHub().signInitialTransaction(transactionBuilder,getOurIdentity().getOwningKey());
 
                 /*
                 INITIATE FLOW SESSION AND GET SIGNATURES FROM COUNTER PARTIES
@@ -273,7 +293,8 @@ public class Settlement {
         }
 
 
-        private TransactionBuilder getOutPuts(AbstractParty owner, AbstractParty counterParty, List<StateAndRef<Asset.Cash>> bondStates, List<StateAndRef<Asset.Cash>> cashStates, Amount<Currency> bondAmount, Amount<Currency> cashAmount,TransactionBuilder tx) {
+        private TransactionBuilder getOutPuts(AbstractParty owner, AbstractParty counterParty, List<StateAndRef<Asset.Cash>> bondStates,
+                                              List<StateAndRef<Asset.Cash>> cashStates, Amount<Currency> bondAmount, Amount<Currency> cashAmount,TransactionBuilder tx) {
 
             int i;
             int j;
@@ -348,7 +369,7 @@ public class Settlement {
 
         private Asset.Cash deriveState(TransactionState<Asset.Cash> templateState, Amount amount, AbstractParty owner,String accountId) {
             Asset.Cash data = templateState.getData();
-            Asset.Cash assetCash = new Asset.Cash(data.getProvider(), owner,data.getObserver(),amount,data.getInstrumentId(),accountId/*,data.getDeposit()*/,"");
+            Asset.Cash assetCash = new Asset.Cash(data.getProvider(), owner,data.getObserver(),amount,data.getInstrumentId(),accountId/*,data.getDeposit()*/,"Settled",data.getLinearId());
             return assetCash;
         }
 

@@ -3,17 +3,11 @@ package com.example.flow;
 import co.paralleluniverse.fibers.Suspendable;
 import com.example.schema.CashSchemaV1;
 import com.example.state.Asset;
-import com.example.state.Custodian;
-import com.example.state.IOUState;
-import com.google.common.collect.ImmutableSet;
 import net.corda.core.contracts.Command;
-import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.contracts.TransactionState;
 import net.corda.core.flows.*;
-import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
-import net.corda.core.node.StatesToRecord;
 import net.corda.core.node.services.Vault;
 import net.corda.core.node.services.VaultService;
 import net.corda.core.node.services.vault.Builder;
@@ -22,14 +16,9 @@ import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-import net.corda.finance.contracts.asset.Cash;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
-import static net.corda.core.contracts.ContractsDSL.requireThat;
 
 public class FixedRateBondOnboardingApproval {
 
@@ -96,7 +85,7 @@ public class FixedRateBondOnboardingApproval {
         //create the state
         assetStateData.setStatus("Asset Onboarded");
         Asset.Cash cashState = new Asset.Cash(assetStateData.getProvider(), assetStateData.getOwner(), assetStateData.getObserver(),
-                assetStateData.getAmount(), assetStateData.getInstrumentId(), assetStateData.getAccountId(), assetStateData.getStatus());
+                assetStateData.getAmount(), assetStateData.getInstrumentId(), assetStateData.getAccountId(), assetStateData.getStatus(),assetStateData.getLinearId());
         Command command = new Command(new Asset.Commands.Issue(), Arrays.asList(getOurIdentity().getOwningKey()));
         TransactionBuilder tx = new TransactionBuilder(notary)
                 .addInputState(cashStateAndRef)
