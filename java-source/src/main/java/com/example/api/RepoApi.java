@@ -1,6 +1,7 @@
 package com.example.api;
 
 import com.example.Utilities;
+import com.example.flow.AssetOnboardingRequest;
 import com.example.flow.CashSetUp;
 import com.example.flow.CustodianInviationFlow;
 import com.example.flow.RepoRequest;
@@ -28,7 +29,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
 
-@Path("repo")
+
 public class RepoApi {
 
     private final CordaRPCOps rpcOps;
@@ -49,14 +50,14 @@ public class RepoApi {
     }
 
     @GET
-    @Path("repoStates")
+    @Path("repo/repoStates")
     @Produces(MediaType.APPLICATION_JSON)
     public List<StateAndRef<RepoAllege>> getRepoStates() {
         return rpcOps.vaultQuery(RepoAllege.class).getStates();
     }
 
     @GET
-    @Path("custodian-invitation")
+    @Path("invitation/custodian-invitation")
     @Produces(MediaType.APPLICATION_JSON)
     public List<String> getCustodianInvitations() {
         List<StateAndRef<Custodian.Test>> states = rpcOps.vaultQuery(Custodian.Test.class).getStates();
@@ -73,26 +74,61 @@ public class RepoApi {
         return stringList;
     }
 
+    @GET
+    @Path("asset-notifications")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> getAssetNotifications() {
+        List<StateAndRef<Custodian.Test>> states = rpcOps.vaultQuery(Custodian.Test.class).getStates();
+        List<String> stringList = new ArrayList<String>();
+
+        for(int i=0;i<=states.size();i++){
+            StateAndRef<Custodian.Test> testStateAndRef = states.get(i);
+            Utilities.ParseCustodianInvitationstates parseCustodianInvitationstates = new Utilities.ParseCustodianInvitationstates();
+            JSONObject jsonObject = parseCustodianInvitationstates.ParseCustodianInvitationstates(testStateAndRef.toString());
+            String s = jsonObject.toString();
+            stringList.add(jsonObject.toString());
+        }
+
+        return stringList;
+    }
+
     @POST
-    @Path("repo/repo-request")
+    @Path("asset/assetIssuance")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createIOU(String jsonString){
+    public Response createAssetIssuanceRequest(String jsonString){
 
         try {
 
+            logger.warn(jsonString);
+            Utilities.DigitalAssetIssuance util = new Utilities.DigitalAssetIssuance(jsonString);
+            Party owner =  rpcOps.wellKnownPartyFromX500Name(util.getOwner());
+            Party provider = rpcOps.wellKnownPartyFromX500Name(util.getProvider());
+            Party operator = rpcOps.wellKnownPartyFromX500Name(util.getOperator());
             final SignedTransaction signedTx = rpcOps
-                    .startTrackedFlowDynamic(RepoRequest.Initiator.class,jsonString)
+                    .startTrackedFlowDynamic(AssetOnboardingRequest.Initiator.class,owner,provider,operator,util.getQuantity(),
+                            util.getInstrumentId(),util.getOwnerAccountId(),util.getOmniBusAccountId(),
+                            util.getNotificationStatus(),util.getNotificationType())
                     .getReturnValue()
                     .get();
 
-            final String msg = String.valueOf(signedTx.getId());
-            return Response.status(CREATED).entity(msg).build();
+            final String msg = String.format(String.valueOf(signedTx.getId()));
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("message",msg);
+            jsonObject.put("status","SUCCESS");
+            jsonObject.put("error", "NA");
+            jsonObject.put("responseBody", "");
+            return Response.status(CREATED).entity(jsonObject).build();
 
         } catch (Throwable ex) {
             final String msg = ex.getMessage();
-            logger.error(ex.getMessage(), ex);
-            return Response.status(BAD_REQUEST).entity(msg).build();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("message",msg);
+            jsonObject.put("status","SUCCESS");
+            jsonObject.put("error", "NA");
+            jsonObject.put("responseBody", "");
+            logger.error(ex.getMessage(), ex.toString());
+            return Response.status(BAD_REQUEST).entity(jsonObject).build();
         }
     }
 
@@ -114,13 +150,20 @@ public class RepoApi {
                     .get();
 
             final String msg = String.format(String.valueOf(signedTx.getId()));
-            JSONObject jsonObject = new JSONObject(msg);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("message",msg);
+            jsonObject.put("status","SUCCESS");
+            jsonObject.put("error", "NA");
+            jsonObject.put("responseBody", "");
             return Response.status(CREATED).entity(jsonObject).build();
 
         } catch (Throwable ex) {
             final String msg = ex.getMessage();
-            JSONObject jsonObject = new JSONObject(msg);
-            logger.error(ex.getMessage(), ex);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("message",msg);
+            jsonObject.put("status","SUCCESS");
+            jsonObject.put("error", ex.toString());
+            jsonObject.put("responseBody", "");
             return Response.status(BAD_REQUEST).entity(jsonObject).build();
         }
     }

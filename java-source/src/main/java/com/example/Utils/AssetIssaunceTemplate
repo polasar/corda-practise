@@ -1,0 +1,43 @@
+request JSON::
+
+{ DigitalAssetIssuance: {
+      owner: {
+        name: "Natixis",
+        organisation: "New York",
+        locality: "US"
+      },
+    provider: {
+        name: "Natixis",
+        organisation: "New York",
+        locality: "US"
+      },
+    operator: {
+        name: "Natixis",
+        organisation: "New York",
+        locality: "US"
+      },
+
+    quantity: 1000,
+    instrumentId: "9801R89",
+    ownerAccountId: "SOC100",
+    omniBusAccountId: "OMNIACC100",
+    notificationType: "DigitalAssetIssuance"
+    notificationStatus: "Pending",
+    }
+}
+
+
+Response JSON::
+
+{
+    message: "",
+    status: "",
+    error: ""
+    responseBody: ""
+}
+
+
+END - POINTS::
+
+http://localhost:10009/asset/assetIssuance
+

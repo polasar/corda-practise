@@ -135,7 +135,7 @@ public class FixedRateBondOnboarding {
                     AssetIssuanceRequest assetIssuanceRequestData = bondStateAndRef.getState().getData();
                     if (me.equals(assetIssuanceRequestData.getProvider())&& assetIssuanceRequestData.getOmniBusAccountId().equals(omniAccountData.getAccountId())&& assetIssuanceRequestData.getProvider().equals(omniAccountData.getOwner())
                     && assetIssuanceRequestData.getProvider().equals(accountData.getProvider()) && assetIssuanceRequestData.getOwner().equals(accountData.getOwner())&& assetIssuanceRequestData.getAccountId().equals(accountData.getAccountId())
-                    && assetIssuanceRequestData.getStatus().equals("Asset Onboarding Request")) {
+                    && assetIssuanceRequestData.getNotificationStatus().equals("Pending")) {
                         //Create transaction components
                         Command command = new Command(new Asset.Commands.Issue(), Arrays.asList(getOurIdentity().getOwningKey(), assetIssuanceRequestData.getOperator().getOwningKey(), assetIssuanceRequestData.getOwner().getOwningKey()));
                         PartyAndReference partyAndReference = new PartyAndReference(assetIssuanceRequestData.getOperator(), OpaqueBytes.of(defaultRef));
@@ -143,9 +143,9 @@ public class FixedRateBondOnboarding {
                          Amount<Issued<Currency>> issuedAmount = issuedBy(DOLLARS(assetIssuanceRequestData.getQuantity()), assetIssuanceRequestData.getOperator().ref(defaultRef));
                         Issued issuerAndToken = new Issued(partyAndReference, amount.getToken());
 //                        Amount issuedAmount = new Amount(amount.getQuantity(), issuerAndToken);
-                        assetIssuanceRequestData.setStatus("Asset Onboarded");
+                        assetIssuanceRequestData.setNotificationStatus("Approved");
                         Asset.Cash cashState = new Asset.Cash(getOurIdentity(), assetIssuanceRequestData.getOwner(), assetIssuanceRequestData.getOperator(), issuedAmount,
-                                assetIssuanceRequestData.getInstrumentId(), assetIssuanceRequestData.getAccountId(), assetIssuanceRequestData.getStatus(), assetIssuanceRequestData.getLinearId());
+                                assetIssuanceRequestData.getInstrumentId(), assetIssuanceRequestData.getAccountId(), assetIssuanceRequestData.getNotificationStatus(), assetIssuanceRequestData.getLinearId());
                         TransactionBuilder transactionBuilder = new TransactionBuilder(notary)
                                 .addInputState(bondStateAndRef)
                                 .addOutputState(cashState, Asset.PROGRAM_ID)

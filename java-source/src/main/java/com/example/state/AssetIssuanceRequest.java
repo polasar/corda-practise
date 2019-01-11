@@ -21,9 +21,11 @@ public  class AssetIssuanceRequest implements LinearState, QueryableState {
         private String instrumentId;
         private String omniBusAccountId;
         private String accountId;
-        private String status;
+        private String notificationStatus;
+        private String notificationType;
 
-    public AssetIssuanceRequest(Party provider, Party operator, Party owner, Long quantity, String instrumentId, String omniBusAccountId, String accountId, String status) {
+    public AssetIssuanceRequest(Party provider, Party operator, Party owner, Long quantity, String instrumentId,
+                                String omniBusAccountId, String accountId, String notificationStatus, String notificationType) {
         this.provider = provider;
         this.operator =operator;
         this.owner = owner;
@@ -31,7 +33,8 @@ public  class AssetIssuanceRequest implements LinearState, QueryableState {
         this.instrumentId = instrumentId;
         this.omniBusAccountId = omniBusAccountId;
         this.accountId = accountId;
-        this.status = status;
+        this.notificationStatus = notificationStatus;
+        this.notificationType = notificationType;
     }
 
 
@@ -47,7 +50,9 @@ public  class AssetIssuanceRequest implements LinearState, QueryableState {
                         this.omniBusAccountId,
                         this.accountId,
                         this.quantity,
-                        this.operator
+                        this.operator,
+                        this.notificationStatus,
+                        this.notificationType
                 );
             } else {
                 throw new IllegalArgumentException("unrecognised schema");
@@ -74,12 +79,16 @@ public  class AssetIssuanceRequest implements LinearState, QueryableState {
         return Arrays.asList(owner,provider,operator);
     }
 
-    public String getStatus() {
-        return status;
+    public String getNotificationStatus() {
+        return notificationStatus;
     }
 
-    public void  setStatus(String status){
-        this.status = status;
+    public void setNotificationStatus(String status){
+        this.notificationStatus = status;
+    }
+
+    public String getNotificationType(){
+        return notificationType;
     }
 
     public Party getProvider(){
@@ -105,6 +114,7 @@ public  class AssetIssuanceRequest implements LinearState, QueryableState {
     public Party getOperator() {
         return operator;
     }
+
     public String getOmniBusAccountId(){
         return omniBusAccountId;
     }

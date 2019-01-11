@@ -25,7 +25,9 @@ public class AssetOnboardingRequest {
         private String instrumentId;
         private String ownerAccountId;
         private String omniBusAccountId;
-        private String status;
+        private String notificationStatus;
+        private String notificationType;
+
 
 
         private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Generating transaction based on new Repo.");
@@ -46,7 +48,8 @@ public class AssetOnboardingRequest {
                 FINALISING_TRANSACTION
         );
 
-        public Initiator(Party owner, Party provider, Party operator, Long quantity, String instrumentId, String ownerAccountId, String omniBusAccountId, String status) {
+        public Initiator(Party owner, Party provider, Party operator, Long quantity, String instrumentId, String ownerAccountId,
+                         String omniBusAccountId, String notificationStatus,String notificationType) {
             this.owner = owner;
             this.provider = provider;
             this.operator = operator;
@@ -54,7 +57,8 @@ public class AssetOnboardingRequest {
             this.instrumentId = instrumentId;
             this.ownerAccountId = ownerAccountId;
             this.omniBusAccountId = omniBusAccountId;
-            this.status = status;
+            this.notificationStatus = notificationStatus;
+            this.notificationType = notificationType;
         }
 
 
@@ -70,10 +74,12 @@ public class AssetOnboardingRequest {
             final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
             //Get the Party
             Party me = getServiceHub().getMyInfo().getLegalIdentities().get(0);
+            SignedTransaction signedTransaction=null;
             // We create the transaction components.
             if(me.equals(owner)) {
                 progressTracker.setCurrentStep(GENERATING_TRANSACTION);
-                AssetIssuanceRequest assetIssuanceRequestState = new AssetIssuanceRequest(provider,operator, getOurIdentity(), this.quantity, this.instrumentId,this.omniBusAccountId, this.ownerAccountId, this.status);
+                AssetIssuanceRequest assetIssuanceRequestState = new AssetIssuanceRequest(provider,operator, getOurIdentity(), this.quantity,
+                        this.instrumentId,this.omniBusAccountId, this.ownerAccountId, this.notificationStatus,this.notificationType);
 
                 //Initialize commandData
                 progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
@@ -93,9 +99,9 @@ public class AssetOnboardingRequest {
                 final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
                 // Finalising the transaction.
-                subFlow(new FinalityFlow(signedTx));
+                signedTransaction = subFlow(new FinalityFlow(signedTx));
             }
-            return null;
+            return signedTransaction;
         }
     }
 

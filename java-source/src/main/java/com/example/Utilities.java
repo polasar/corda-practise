@@ -15,8 +15,8 @@ import java.util.*;
 @CordaSerializable
 public class Utilities implements Serializable{
 
-    @CordaSerializable
-    public static class RepoRequest implements  Serializable{
+
+    public static class RepoRequest {
 
         private CordaX500Name counterParty;
         private boolean applicantIsBuyer;
@@ -377,8 +377,121 @@ public class Utilities implements Serializable{
         }
     }
 
-    @CordaSerializable
-    public static class PartySubClass implements Serializable {
+
+    public static class DigitalAssetIssuance {
+
+        private CordaX500Name owner;
+        private CordaX500Name provider;
+        private CordaX500Name operator;
+        private Long quantity;
+        private String instrumentId;
+        private String ownerAccountId;
+        private String omniBusAccountId;
+        private String notificationType;
+        private String notificationStatus;
+        private String status;
+
+
+        public DigitalAssetIssuance(String jsonStringParser) {
+
+            JSONObject obj = new JSONObject(jsonStringParser);
+            JSONObject digitalAssetIssuance = obj.getJSONObject("DigitalAssetIssuance");
+            PartySubClass ownerParty = new PartySubClass((digitalAssetIssuance.getJSONObject("owner")));
+            setOwner(ownerParty.getCordaX500Name());
+            PartySubClass providerParty = new PartySubClass(digitalAssetIssuance.getJSONObject("provider"));
+            setProvider(providerParty.getCordaX500Name());
+            PartySubClass operatorParty = new PartySubClass(digitalAssetIssuance.getJSONObject("operator"));
+            setOperator(operatorParty.getCordaX500Name());
+            setQuantity(Long.valueOf((Integer)digitalAssetIssuance.get("quantity")));
+            setInstrumentId((String) digitalAssetIssuance.get("instrumentId"));
+            setOwnerAccountId(digitalAssetIssuance.getString("ownerAccountId"));
+            setOmniBusAccountId(digitalAssetIssuance.getString("omniBusAccountId"));
+            setNotificationType(digitalAssetIssuance.getString("notificationType"));
+            setNotificationStatus(digitalAssetIssuance.getString("notificationStatus"));
+        }
+
+        public CordaX500Name getOwner() {
+            return owner;
+        }
+
+        public void setOwner(CordaX500Name owner) {
+            this.owner = owner;
+        }
+
+        public CordaX500Name getProvider() {
+            return provider;
+        }
+
+        public void setProvider(CordaX500Name provider) {
+            this.provider = provider;
+        }
+
+        public CordaX500Name getOperator() {
+            return operator;
+        }
+
+        public void setOperator(CordaX500Name operator) {
+            this.operator = operator;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public Long getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(Long quantity) {
+            this.quantity = quantity;
+        }
+
+        public String getInstrumentId() {
+            return instrumentId;
+        }
+
+        public void setInstrumentId(String instrumentId) {
+            this.instrumentId = instrumentId;
+        }
+
+        public String getOwnerAccountId() {
+            return ownerAccountId;
+        }
+
+        public void setOwnerAccountId(String ownerAccountId) {
+            this.ownerAccountId = ownerAccountId;
+        }
+
+        public String getOmniBusAccountId() {
+            return omniBusAccountId;
+        }
+
+        public void setOmniBusAccountId(String omniBusAccountId) {
+            this.omniBusAccountId = omniBusAccountId;
+        }
+
+        public String getNotificationType() {
+            return notificationType;
+        }
+
+        public void setNotificationType(String notificationType) {
+            this.notificationType = notificationType;
+        }
+
+        public String getNotificationStatus() {
+            return notificationStatus;
+        }
+
+        public void setNotificationStatus(String notificationStatus) {
+            this.notificationStatus = notificationStatus;
+        }
+    }
+
+    public static class PartySubClass {
         CordaX500Name cordaX500Name;
         private String name;
         private String organisation;

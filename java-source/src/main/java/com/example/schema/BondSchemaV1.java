@@ -34,9 +34,13 @@ public class BondSchemaV1 extends MappedSchema {
         private Long quantity;
         @Column(name = "operator")
         private Party operator;
+        @Column(name = "notificationStatus")
+        private String notificationStatus;
+        @Column(name = "notificationType")
+        private String notificationType;
 
 
-        public PersistentOper(Party provider, Party owner, String instrumentId,String omniBusAccountId, String accountId, Long quantity,Party operator) {
+        public PersistentOper(Party provider, Party owner, String instrumentId, String omniBusAccountId, String accountId, Long quantity, Party operator, String notificationStatus, String notificationType) {
             this.provider = provider;
             this.owner = owner;
             this.instrumentId = instrumentId;
@@ -44,6 +48,8 @@ public class BondSchemaV1 extends MappedSchema {
             this.accountId = accountId;
             this.quantity = quantity;
             this.operator = operator;
+            this.notificationStatus = notificationStatus;
+            this.notificationType = notificationType;
         }
 
         public PersistentOper() {
@@ -54,6 +60,8 @@ public class BondSchemaV1 extends MappedSchema {
             this.accountId = null;
             this.quantity = null;
             this.operator =null;
+            this.notificationStatus=null;
+            this.notificationType=null;
         }
 
         public Party getProvider() {
@@ -82,6 +90,14 @@ public class BondSchemaV1 extends MappedSchema {
 
         public String getOmniBusAccountId() {
             return omniBusAccountId;
+        }
+
+        public String getNotificationStatus() {
+            return notificationStatus;
+        }
+
+        public String getNotificationType() {
+            return notificationType;
         }
     }
 
