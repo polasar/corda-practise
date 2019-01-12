@@ -11,9 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @CordaSerializable
-public class BondSchemaV1 extends MappedSchema {
-    public BondSchemaV1() {
-        super(IOUSchema.class, 1, ImmutableList.of(BondSchemaV1.PersistentOper.class));
+public class AssetIssuanceSchemaV1 extends MappedSchema {
+    public AssetIssuanceSchemaV1() {
+        super(IOUSchema.class, 1, ImmutableList.of(AssetIssuanceSchemaV1.PersistentOper.class));
     }
 
     @Entity

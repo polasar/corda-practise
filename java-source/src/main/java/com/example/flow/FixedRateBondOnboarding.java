@@ -90,7 +90,6 @@ public class FixedRateBondOnboarding {
             VaultService vaultService = getServiceHub().getVaultService();
             QueryCriteria criteria1 = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
             QueryCriteria criteria11 = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-            QueryCriteria criteria12 = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
 //            List<StateAndRef<Account>> states = vaultService.queryBy(Account.class, criteria1).getStates();
             try {
                 omniBusAccountProvider = AccountSchemaV1.PersistentOper.class.getDeclaredField("provider");

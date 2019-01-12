@@ -1,6 +1,6 @@
 package com.example.state;
 
-import com.example.schema.BondSchemaV1;
+import com.example.schema.AssetIssuanceSchemaV1;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.*;
 import net.corda.core.identity.AbstractParty;
@@ -43,8 +43,8 @@ public  class AssetIssuanceRequest implements LinearState, QueryableState {
         @org.jetbrains.annotations.NotNull
         @Override
         public PersistentState generateMappedObject(MappedSchema schema) {
-            if (schema instanceof BondSchemaV1) {
-                return new BondSchemaV1.PersistentOper(this.provider,
+            if (schema instanceof AssetIssuanceSchemaV1) {
+                return new AssetIssuanceSchemaV1.PersistentOper(this.provider,
                         this.owner,
                         this.instrumentId,
                         this.omniBusAccountId,
@@ -61,7 +61,7 @@ public  class AssetIssuanceRequest implements LinearState, QueryableState {
     @org.jetbrains.annotations.NotNull
     @Override
     public Iterable<MappedSchema> supportedSchemas() {
-        return  ImmutableList.of(new BondSchemaV1());
+        return  ImmutableList.of(new AssetIssuanceSchemaV1());
     }
 
 

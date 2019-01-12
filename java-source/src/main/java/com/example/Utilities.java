@@ -532,4 +532,40 @@ public class Utilities implements Serializable{
         }
     }
 
+    public static class ParseAssetIssuanceRequest{
+
+        private CordaX500Name provider;
+        private CordaX500Name operator;
+        private CordaX500Name owner;
+        private String quantity;
+        private String instrumentId;
+        private String ownerAccountId;
+        private String notificationType;
+        private String omniBusAccountId;
+        private String notificationStatus;
+
+        public JSONObject ParseAssetIssuanceRequest(String jsonString){
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONObject getFormattedJSONString = new JSONObject();
+            provider = CordaX500Name.parse(jsonObject.getString("provider"));
+            operator = CordaX500Name.parse(jsonObject.getString("operator"));
+            owner = CordaX500Name.parse(jsonObject.getString("owner"));
+            quantity = jsonObject.getString("quantity");
+            instrumentId = jsonObject.getString("instrumentId");
+            ownerAccountId = jsonObject.getString("ownerAccountId");
+            notificationType = jsonObject.getString("notificationType");
+            omniBusAccountId = jsonObject.getString("omniBusAccountId");
+            notificationStatus = jsonObject.getString("notificationStatus");
+            getFormattedJSONString.put("provider",provider);
+            getFormattedJSONString.put("operator", operator);
+            getFormattedJSONString.put("operator", owner);
+            getFormattedJSONString.put("operator", instrumentId);
+            getFormattedJSONString.put("operator", ownerAccountId);
+            getFormattedJSONString.put("operator", notificationType);
+            getFormattedJSONString.put("operator", omniBusAccountId);
+            getFormattedJSONString.put("operator", notificationStatus);
+            return getFormattedJSONString;
+        }
+    }
+
 }
