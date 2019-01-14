@@ -23,6 +23,7 @@ import net.corda.core.node.services.vault.Builder;
 import net.corda.core.node.services.vault.CriteriaExpression;
 import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
 
-
+@Path("bilateralrepo")
 public class RepoApi {
 
     private final CordaRPCOps rpcOps;
@@ -107,10 +109,13 @@ public class RepoApi {
         QueryCriteria criteria = criteria1.and(notificationQueryCriteria.and(digitalAssetQueryCriteria));
         List<StateAndRef<AssetIssuanceRequest>> results = rpcOps.vaultQueryByCriteria(criteria,AssetIssuanceRequest.class).getStates();
         List<String> stringList = new ArrayList<String>();
+
         for(int i=0;i<=results.size();i++){
             StateAndRef<AssetIssuanceRequest> testStateAndRef = results.get(i);
+            AssetIssuanceRequest data = testStateAndRef.getState().getData();
+
             Utilities.ParseAssetIssuanceRequest parseAssetIssuanceRequest = new Utilities.ParseAssetIssuanceRequest();
-            JSONObject jsonObject = parseAssetIssuanceRequest.ParseAssetIssuanceRequest(testStateAndRef.toString());
+            JSONObject jsonObject = parseAssetIssuanceRequest.ParseAssetIssuanceRequest(data);
             String s = jsonObject.toString();
             stringList.add(jsonObject.toString());
         }
@@ -127,6 +132,7 @@ public class RepoApi {
         try {
 
             logger.warn(jsonString);
+
             Utilities.DigitalAssetIssuance util = new Utilities.DigitalAssetIssuance(jsonString);
             Party owner =  rpcOps.wellKnownPartyFromX500Name(util.getOwner());
             Party provider = rpcOps.wellKnownPartyFromX500Name(util.getProvider());

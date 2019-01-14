@@ -1,6 +1,8 @@
 package com.example;
 
 
+import com.example.flow.AssetOnboardingRequest;
+import com.example.state.AssetIssuanceRequest;
 import com.example.state.CollateralData;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
@@ -544,7 +546,8 @@ public class Utilities implements Serializable{
         private String omniBusAccountId;
         private String notificationStatus;
 
-        public JSONObject ParseAssetIssuanceRequest(String jsonString){
+        public JSONObject ParseAssetIssuanceRequest(AssetIssuanceRequest assetOnboardingRequest){
+            String jsonString = null;
             JSONObject jsonObject = new JSONObject(jsonString);
             JSONObject getFormattedJSONString = new JSONObject();
             provider = CordaX500Name.parse(jsonObject.getString("provider"));
