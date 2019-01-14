@@ -110,7 +110,7 @@ public class RepoApi {
         List<StateAndRef<AssetIssuanceRequest>> results = rpcOps.vaultQueryByCriteria(criteria,AssetIssuanceRequest.class).getStates();
         List<String> stringList = new ArrayList<String>();
 
-        for(int i=0;i<=results.size();i++){
+        for(int i=0;i<results.size();i++){
             StateAndRef<AssetIssuanceRequest> testStateAndRef = results.get(i);
             AssetIssuanceRequest data = testStateAndRef.getState().getData();
 

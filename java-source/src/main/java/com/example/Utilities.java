@@ -536,9 +536,9 @@ public class Utilities implements Serializable{
 
     public static class ParseAssetIssuanceRequest{
 
-        private CordaX500Name provider;
-        private CordaX500Name operator;
-        private CordaX500Name owner;
+        private String providerName;
+        private String operatorName;
+        private String ownerName;
         private String quantity;
         private String instrumentId;
         private String ownerAccountId;
@@ -547,26 +547,26 @@ public class Utilities implements Serializable{
         private String notificationStatus;
 
         public JSONObject ParseAssetIssuanceRequest(AssetIssuanceRequest assetOnboardingRequest){
-            String jsonString = null;
-            JSONObject jsonObject = new JSONObject(jsonString);
+            providerName = assetOnboardingRequest.getProvider().getName().getOrganisation();
+            operatorName = assetOnboardingRequest.getOperator().getName().getOrganisation();
+            ownerName = assetOnboardingRequest.getOwner().getName().getOrganisation();
+            quantity = String.valueOf(assetOnboardingRequest.getQuantity());
+            instrumentId = assetOnboardingRequest.getInstrumentId();
+            ownerAccountId = assetOnboardingRequest.getAccountId();
+            omniBusAccountId = assetOnboardingRequest.getOmniBusAccountId();
+            notificationStatus = assetOnboardingRequest.getNotificationStatus();
+            notificationType = assetOnboardingRequest.getNotificationType();
+
             JSONObject getFormattedJSONString = new JSONObject();
-            provider = CordaX500Name.parse(jsonObject.getString("provider"));
-            operator = CordaX500Name.parse(jsonObject.getString("operator"));
-            owner = CordaX500Name.parse(jsonObject.getString("owner"));
-            quantity = jsonObject.getString("quantity");
-            instrumentId = jsonObject.getString("instrumentId");
-            ownerAccountId = jsonObject.getString("ownerAccountId");
-            notificationType = jsonObject.getString("notificationType");
-            omniBusAccountId = jsonObject.getString("omniBusAccountId");
-            notificationStatus = jsonObject.getString("notificationStatus");
-            getFormattedJSONString.put("provider",provider);
-            getFormattedJSONString.put("operator", operator);
-            getFormattedJSONString.put("operator", owner);
-            getFormattedJSONString.put("operator", instrumentId);
-            getFormattedJSONString.put("operator", ownerAccountId);
-            getFormattedJSONString.put("operator", notificationType);
-            getFormattedJSONString.put("operator", omniBusAccountId);
-            getFormattedJSONString.put("operator", notificationStatus);
+            getFormattedJSONString.put("provider", providerName);
+            getFormattedJSONString.put("operator", operatorName);
+            getFormattedJSONString.put("owner", ownerName);
+            getFormattedJSONString.put("quantity", quantity);
+            getFormattedJSONString.put("instrumentId", instrumentId);
+            getFormattedJSONString.put("ownerAccountId", ownerAccountId);
+            getFormattedJSONString.put("omniBusAccountId", omniBusAccountId);
+            getFormattedJSONString.put("notificationType", notificationType);
+            getFormattedJSONString.put("notificationStatus", notificationStatus);
             return getFormattedJSONString;
         }
     }
