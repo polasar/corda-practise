@@ -20,15 +20,14 @@ public class DvPStart implements LinearState, QueryableState {
     private Party seller;
     private Party agent;
     private String dvpId;
-    private List<CollateralData.Pledge> pledgeList;
-    private List<CollateralData.Borrower> borrowerList;
+    private ArrayList<LinkedHashMap<String, Object>> pledgeList;
+    private ArrayList<LinkedHashMap<String, Object>> borrowerList;
     private final UniqueIdentifier linearId;
     private Date settlementDate;
     private String repoId;
 
 
-    public DvPStart(Party buyer, Party seller, String dvpId,
-                    UniqueIdentifier linearId, Date settlementDate, List<CollateralData.Pledge> pledgeList, List<CollateralData.Borrower> borrowerList, Party agent, String repoId) {
+    public DvPStart(UniqueIdentifier linearId, ArrayList<LinkedHashMap<String, Object>> pledgeList, ArrayList<LinkedHashMap<String, Object>> borrowerList, String repoId) {
         this.buyer = buyer;
         this.seller = seller;
         this.dvpId = dvpId;
@@ -76,8 +75,7 @@ public class DvPStart implements LinearState, QueryableState {
     @Override
     public PersistentState generateMappedObject(MappedSchema schema) {
         if(schema instanceof DvPSchemaV1){
-            return new DvPSchemaV1.PersistentOper(this.buyer,this.seller,this.agent,this.dvpId,
-                     this.linearId.getId(),this.settlementDate.toString(),repoId);
+            return new DvPSchemaV1.PersistentOper(this.linearId.getId(),repoId);
         }
         else{
             throw new IllegalArgumentException("unrecognised schema");
@@ -94,11 +92,11 @@ public class DvPStart implements LinearState, QueryableState {
         return repoId;
     }
 
-    public List<CollateralData.Pledge> getPledgeList() {
+    public ArrayList<LinkedHashMap<String, Object>> getPledgeList() {
         return pledgeList;
     }
 
-    public List<CollateralData.Borrower> getBorrowerList() {
+    public ArrayList<LinkedHashMap<String, Object>> getBorrowerList() {
         return borrowerList;
     }
 }

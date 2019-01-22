@@ -28,17 +28,11 @@ public class CollateralSchemaV1 extends MappedSchema {
         @Column(name = "linearId")
         private final UUID linearId;
 
-        public PersistentOper(Long totalCashAmount, Long totalPrincipal, String totalNetConsideration, UUID linearId) {
-            this.totalCashAmount = totalCashAmount;
-            this.totalPrincipal = totalPrincipal;
-            this.totalNetConsideration = totalNetConsideration;
+        public PersistentOper(UUID linearId) {
             this.linearId = linearId;
         }
 
         public PersistentOper(){
-            this.totalCashAmount = null;
-            this.totalPrincipal = null;
-            this.totalNetConsideration = null;
             this.linearId = null;
         }
 

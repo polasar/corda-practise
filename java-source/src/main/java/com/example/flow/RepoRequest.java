@@ -41,8 +41,8 @@ public class RepoRequest {
         private Long totalCashAmount;
         private Long totalPrincipal;
         private Long totalNetConsideration;
-        private List<CollateralData.Pledge> pledgeData;
-        private List<CollateralData.Borrower> borrowerData;
+        private List<HashMap<String, Object>> pledgeData;
+        private List<HashMap<String, Object>> borrowerData;
 
 
         private final Step GENERATING_TRANSACTION = new Step("Generating transaction based on new Repo.");
@@ -65,27 +65,15 @@ public class RepoRequest {
 
 
 
-        public Initiator(Party counterParty, boolean applicantIsBuyer, String repoId, String eligibilityCriteriaDataId,
-                         Date startDate, Date endDate, String terminationPaymentLeg, Party agent,
-                         String status,String accountId, Long amount, Long totalCashAmount, Long totalPrincipal, Long totalNetConsideration,
-                         List<CollateralData.Pledge> pledgeData, List<CollateralData.Borrower> borrowerData) {
-            this.counterParty = counterParty;
-            this.applicantIsBuyer = applicantIsBuyer;
+        public Initiator(String repoId, Long amount,
+                         List<HashMap<String, Object>> pledgeData, List<HashMap<String, Object>> borrowerData) {
+
             this.repoId = repoId;
-            this.eligibilityCriteriaDataId = eligibilityCriteriaDataId;
-            this.startDate = startDate;
-            this.endDate = endDate;
-            this.terminationPaymentLeg = terminationPaymentLeg;
-            this.agent = agent;
-            this.status = status;
-            this.accountId = accountId;
             this.amount = amount;
-            this.totalCashAmount = totalCashAmount;
-            this.totalPrincipal = totalPrincipal;
-            this.totalNetConsideration = totalNetConsideration;
             this.pledgeData = pledgeData;
             this.borrowerData = borrowerData;
         }
+
 
         @Override
         public ProgressTracker getProgressTracker() {
@@ -107,13 +95,14 @@ public class RepoRequest {
                 e.printStackTrace();
             }
 
+
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
             String concatRepoID = repoId.concat(timeStamp);
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
             RepoAllege outputState = new RepoAllege(getOurIdentity(),counterParty,applicantIsBuyer,concatRepoID,eligibilityCriteriaDataId,
                     uniqueIdentifier,startDate,endDate,terminationPaymentLeg,agent,status,this.accountId,this.amount);
             //Collateral States
-            Collateral collateral = new Collateral(totalCashAmount,totalPrincipal,totalNetConsideration,pledgeData,borrowerData,uniqueIdentifier,getOurIdentity(),agent);
+          //  Collateral collateral = new Collateral(pledgeData,borrowerData,uniqueIdentifier);
             //Initialize commandData
             progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
             CommandData cmdType = new RepoContract.Commands.Issue();

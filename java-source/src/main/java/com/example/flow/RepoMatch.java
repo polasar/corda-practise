@@ -133,10 +133,10 @@ public class RepoMatch {
                                 repo = new Repo(buyerData.getApplicant(), buyerData.getCounterParty(), buyerData.getRepoId(), buyerData.getEligibilityCriteriaDataId(), uniqueIdentifier,
                                         buyerData.getStartDate(),
                                         buyerData.getEndDate(), buyerData.getTerminationPaymentLeg(), buyerData.getAgent(),buyerData.getAccountId(),buyerData.getAmount());
-                                DvPStart = new DvPStart(buyerData.getApplicant(), buyerData.getCounterParty(), "DvP-START", uniqueIdentifier,
-                                        buyerData.getEndDate(),collateral.getPledgeCollateralData(), collateral.getBorrowerCollateralData(), buyerData.getAgent(), buyerData.getRepoId());
-                                DvPEnd = new DvPEnd(buyerData.getApplicant(), buyerData.getCounterParty(), "DvP-END", uniqueIdentifier,
-                                        buyerData.getEndDate(), collateral.getPledgeCollateralData(),collateral.getBorrowerCollateralData(),buyerData.getAgent(),buyerData.getRepoId());
+                                DvPStart = new DvPStart(uniqueIdentifier,collateral.getPledgeCollateralData(),collateral.getBorrowerCollateralData(),
+                                        buyerData.getRepoId());
+                                DvPEnd = new DvPEnd(uniqueIdentifier,collateral.getPledgeCollateralData(),collateral.getBorrowerCollateralData(),
+                                        buyerData.getRepoId());
                                 repoAllege = new RepoAllege(buyerData.getApplicant(), buyerData.getCounterParty(), buyerData.isApplicantIsBuyer(), buyerData.getRepoId(), buyerData.getEligibilityCriteriaDataId(),
                                         buyerData.getLinearId(), buyerData.getStartDate(), buyerData.getEndDate(), buyerData.getTerminationPaymentLeg(), buyerData.getAgent(), buyerData.getStatus(),
                                         buyerData.getAccountId(),buyerData.getAmount());

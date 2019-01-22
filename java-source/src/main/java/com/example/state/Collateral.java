@@ -1,7 +1,6 @@
 package com.example.state;
 
 import com.example.schema.CollateralSchemaV1;
-import com.example.schema.RepoAllegeSchemaV1;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
@@ -12,31 +11,27 @@ import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Collateral implements QueryableState, LinearState {
 
     private Long totalCashAmount;
     private Long totalPrincipal;
     private Long totalNetConsideration;
-    private List<CollateralData.Pledge> pledgeCollateralData;
-    private List<CollateralData.Borrower> borrowerCollateralData;
+    private ArrayList<LinkedHashMap<String, Object>> pledgeCollateralData;
+    private ArrayList<LinkedHashMap<String, Object>> borrowerCollateralData;
     private UniqueIdentifier uniqueIdentifier;
     private Party agent;
     private Party applicant;
 
 
-    public Collateral(Long totalCashAmount, Long totalPrincipal, Long totalNetConsideration, List<CollateralData.Pledge> pledgeCollateralData,
-                      List<CollateralData.Borrower> borrowerCollateralData,UniqueIdentifier uniqueIdentifier,Party agent, Party applicant) {
-        this.totalCashAmount = totalCashAmount;
-        this.totalPrincipal = totalPrincipal;
-        this.totalNetConsideration = totalNetConsideration;
+    public Collateral(ArrayList<LinkedHashMap<String, Object>> pledgeCollateralData,
+                      ArrayList<LinkedHashMap<String, Object>> borrowerCollateralData, UniqueIdentifier uniqueIdentifier) {
+
         this.pledgeCollateralData = pledgeCollateralData;
         this.borrowerCollateralData = borrowerCollateralData;
         this.uniqueIdentifier = uniqueIdentifier;
-        this.agent = agent;
-        this.applicant = applicant;
+
     }
 
     public Long getTotalCashAmount() {
@@ -51,11 +46,11 @@ public class Collateral implements QueryableState, LinearState {
         return totalNetConsideration;
     }
 
-    public List<CollateralData.Pledge> getPledgeCollateralData() {
+    public ArrayList<LinkedHashMap<String, Object>> getPledgeCollateralData() {
         return pledgeCollateralData;
     }
 
-    public List<CollateralData.Borrower> getBorrowerCollateralData() {
+    public ArrayList<LinkedHashMap<String, Object>> getBorrowerCollateralData() {
         return borrowerCollateralData;
     }
 
@@ -70,7 +65,7 @@ public class Collateral implements QueryableState, LinearState {
     public PersistentState generateMappedObject(MappedSchema schema) {
 
         if (schema instanceof CollateralSchemaV1) {
-            return new CollateralSchemaV1.PersistentOper(getTotalCashAmount(),getTotalPrincipal(),getTotalNetConsideration().toString(),getLinearId().getId());
+            return new CollateralSchemaV1.PersistentOper(getLinearId().getId());
         } else {
             throw new IllegalArgumentException("Unrecognised schema exception");
         }

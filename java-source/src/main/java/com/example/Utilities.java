@@ -1,11 +1,9 @@
 package com.example;
 
 
-import com.example.flow.AssetOnboardingRequest;
 import com.example.state.AssetIssuanceRequest;
-import com.example.state.CollateralData;
+import com.example.state.Collateral;
 import net.corda.core.identity.CordaX500Name;
-import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.serialization.CordaSerializable;
 import org.json.JSONArray;
@@ -47,70 +45,34 @@ public class Utilities implements Serializable{
         private Long currentQuantity;
         private Long currentValue;
 
-        private List<CollateralData.Pledge> pledgeArrayList ;
-        private List<CollateralData.Borrower> borrowerArrayList;
 
 
+        List<HashMap<String, Object>> pledgeArrayList = new ArrayList<>();
+        List<HashMap<String, Object>> borrowerArrayList = new ArrayList<>();
         public RepoRequest(String jsonString, CordaRPCOps rpcOps) {
 
             JSONObject obj = new JSONObject(jsonString);
             JSONObject repoRequest = (JSONObject) obj.get("RepoRequest");
-            PartySubClass partySubClass = new PartySubClass((JSONObject) repoRequest.get("counterParty"));
-            setCounterParty(partySubClass.getCordaX500Name());
-            setApplicantIsBuyer((boolean) repoRequest.get("applicantIsBuyer"));
             setRepoId((String) repoRequest.get("repoId"));
-            setEligibilityCriteriaDataId ((String) repoRequest.get("eligibilityCriteriaDataId"));
-            setStartDate((Date) repoRequest.get("startDate"));
-            setEndDate((Date)repoRequest.get("endDate"));
-            setTerminationPaymentLeg((String)repoRequest.get("terminationPaymentLeg"));
-            PartySubClass agentClass = new PartySubClass((JSONObject) repoRequest.get("agent"));
-            setAgent(agentClass.getCordaX500Name());
-            setStatus((String) repoRequest.get("status"));
-            setAccountId((String) repoRequest.get("accountId"));
-            setAmount(Long.valueOf((Integer) (repoRequest.get("amount"))));
+            setAmount(Long.valueOf((String) repoRequest.get("quantity")));
             JSONObject collateralData  = repoRequest.getJSONObject("Collateral");
-            setTotalCashAmount(Long.valueOf((Integer) (collateralData.get("total cash amount"))));
-            setTotalPrincipal(Long.valueOf((Integer) (collateralData.get("total principal"))));
-            setTotalNetConsideration(Long.valueOf((Integer) (collateralData.get("total net consideration"))));
-            JSONArray jsonArray = collateralData.getJSONArray("Collateral Details");
+            JSONArray jsonArray = collateralData.getJSONArray("CollateralDetails");
 
 
             for(int i=0; i<jsonArray.length(); i++){
-                CollateralData.Pledge pledge;
-                CollateralData.Borrower borrower;
+                Collateral collateral;
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                JSONObject pledgeDetails = (JSONObject) jsonObject.get("Pledge Details");
-                setToken((String)pledgeDetails.get("token"));
-                setTokenDescription((String)pledgeDetails.get("token description"));
-                setAssetType((String)pledgeDetails.get("assetType"));
-                setCleanPrice((int)pledgeDetails.get("cleanPrice"));
-                setQuantity(Long.valueOf((Integer)pledgeDetails.get("quantity")));
-                setCollateralPrincipal(Long.valueOf((Integer)pledgeDetails.get("principal")));
-                setDirtyPrice((Integer)pledgeDetails.get("dirtyPrice"));
-                setHairCut((Integer)pledgeDetails.get("hairCut"));
-                setNetConsideration(Long.valueOf((Integer)pledgeDetails.get("net consideration")));
-                setCurrentQuantity(Long.valueOf((Integer)pledgeDetails.get("current quantity")));
-                setCurrentValue(Long.valueOf((Integer)pledgeDetails.get("current value")));
-                pledge = new CollateralData.Pledge(getToken(),getTokenDescription(),getAssetType(),getCleanPrice(),getQuantity(),getDirtyPrice(),
-                        getHairCut(),getNetConsideration(),getCurrentQuantity(),getCurrentValue());
+                JSONObject pledgeDetails = (JSONObject) jsonObject.get("PledgeDetails");
+                HashMap<String,Object> pledgeData= new LinkedHashMap<>();
+                pledgeData.put("amount",Long.valueOf((String) pledgeDetails.get("quantity")));
+                pledgeData.put("instrumentId",(String)pledgeDetails.get("token"));
+                pledgeArrayList.add( pledgeData);
 
-                pledgeArrayList.add(pledge);
-
-                JSONObject deliveryDetails = (JSONObject) jsonObject.get("Delivery Details");
-                setToken((String)deliveryDetails.get("token"));
-                setTokenDescription((String)deliveryDetails.get("token description"));
-                setAssetType((String)deliveryDetails.get("assetType"));
-                setCleanPrice((int)deliveryDetails.get("cleanPrice"));
-                setQuantity(Long.valueOf((Integer)deliveryDetails.get("quantity")));
-                setCollateralPrincipal(Long.valueOf((Integer)deliveryDetails.get("principal")));
-                setDirtyPrice((Integer)deliveryDetails.get("dirtyPrice"));
-                setHairCut((Integer)deliveryDetails.get("hairCut"));
-                setNetConsideration(Long.valueOf((Integer)deliveryDetails.get("net consideration")));
-                setCurrentQuantity(Long.valueOf((Integer)deliveryDetails.get("current quantity")));
-                setCurrentValue(Long.valueOf((Integer)deliveryDetails.get("current value")));
-                borrower = new CollateralData.Borrower(getToken(),getTokenDescription(),getAssetType(),getCleanPrice(),getQuantity(),getDirtyPrice(),
-                        getHairCut(),getNetConsideration(),getCurrentQuantity(),getCurrentValue());
-                borrowerArrayList.add(borrower);
+                JSONObject deliveryDetails = (JSONObject) jsonObject.get("DeliveryDetails");
+                HashMap<String,Object> borrowerData= new LinkedHashMap<>();
+                borrowerData.put("amount",Long.valueOf((String) deliveryDetails.get("quantity")));
+                borrowerData.put("instrumentId",(String)pledgeDetails.get("token"));
+                borrowerArrayList.add(borrowerData);
             }
 
         }
@@ -238,11 +200,11 @@ public class Utilities implements Serializable{
             this.totalNetConsideration = totalNetConsideration;
         }
 
-        public List<CollateralData.Pledge> getPledgeArrayList() {
+        public List<HashMap<String, Object>> getPledgeArrayList() {
             return pledgeArrayList;
         }
 
-        public List<CollateralData.Borrower> getBorrowerArrayList() {
+        public List<HashMap<String, Object>> getBorrowerArrayList() {
             return borrowerArrayList;
         }
 

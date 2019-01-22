@@ -84,7 +84,7 @@ start FixedRateBondOnboarding$Initiator omniBusProvider: "O=Custodian,L=Paris,C=
 
 start FixedRateBondOnboarding$Initiator omniBusProvider: "O=Custodian,L=Paris,C=FR", omniBusOwner: "O=Custodian,L=Paris,C=FR", omniBusAccountId: "OMNIACC1", accountProvider: "O=Custodian,L=Paris,C=FR", accountOwner: "O=Natixis,L=New York,C=US", accountId: "NAT100"
 
-start AssetOnboardingRequest owner: "O=SocGen,L=London,C=GB", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 1000, instrumentId: "9801R89", ownerAccountId: "SOC100", omniBusAccountId: "OMNIACC1", notificationStatus: "Pending", notificationType: "DigitalAssetIssuance"
+start AssetOnboardingRequest owner: "O=SocGen,L=London,C=GB", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 3000, instrumentId: "9801R87", ownerAccountId: "SOC100", omniBusAccountId: "OMNIACC1", notificationStatus: "Pending", notificationType: "DigitalAssetIssuance"
 
 start AssetOnboardingRequest owner: "O=SocGen,L=London,C=GB", provider: "O=Custodian,L=Paris,C=FR", operator: "O=BR,L=Paris,C=FR", quantity: 3000, instrumentId: "9801R83", ownerAccountId: "SOC100", omniBusAccountId: "OMNIACC1", status: "Asset Onboarding Request"
 

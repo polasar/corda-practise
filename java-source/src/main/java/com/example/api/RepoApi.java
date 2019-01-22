@@ -33,9 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
@@ -210,13 +208,13 @@ public class RepoApi {
         try {
             Utilities.RepoRequest repoRequest = new Utilities.RepoRequest(jsonString,rpcOps);
             logger.warn(jsonString);
-            Party counterParty = rpcOps.wellKnownPartyFromX500Name(repoRequest.getCounterParty());
-            Party agent = rpcOps.wellKnownPartyFromX500Name(repoRequest.getAgent());
+//            Party counterParty = rpcOps.wellKnownPartyFromX500Name(repoRequest.getCounterParty());
+//            Party agent = rpcOps.wellKnownPartyFromX500Name(repoRequest.getAgent());
+            List<HashMap<String, Object>> pledgeArrayList = repoRequest.getPledgeArrayList();
+            List<HashMap<String, Object>> borrowerArrayList = repoRequest.getBorrowerArrayList();
             final SignedTransaction signedTx = rpcOps
-                    .startTrackedFlowDynamic(RepoRequest.Initiator.class,counterParty,repoRequest.isApplicantIsBuyer(),repoRequest.getRepoId(),
-                            repoRequest.getEligibilityCriteriaDataId(),repoRequest.getStartDate(),repoRequest.getEndDate(),
-                            repoRequest.getTerminationPaymentLeg(),agent,repoRequest.getStatus(),repoRequest.getAccountId(),repoRequest.getAmount()
-                    ,repoRequest.getTotalCashAmount(),repoRequest.getTotalPrincipal(),repoRequest.getTotalNetConsideration(),repoRequest.getPledgeArrayList(),repoRequest.getBorrowerArrayList())
+                    .startTrackedFlowDynamic(RepoRequest.Initiator.class,repoRequest.getRepoId(),repoRequest.getAmount()
+                    , pledgeArrayList,borrowerArrayList)
                     .getReturnValue()
                     .get();
 

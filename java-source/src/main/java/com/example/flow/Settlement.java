@@ -134,15 +134,15 @@ public class Settlement {
                 PAYMENT AND DELIVERY LEGS
                  */
 
-            List<CollateralData.Pledge> pledgeList = dvpStates.getState().getData().getPledgeList();
-            List<CollateralData.Borrower> borrowerList = dvpStates.getState().getData().getBorrowerList();
+            ArrayList<LinkedHashMap<String, Object>> pledgeList = dvpStates.getState().getData().getPledgeList();
+            ArrayList<LinkedHashMap<String, Object>> borrowerList = dvpStates.getState().getData().getBorrowerList();
                 for(int i=0, j=0; i<pledgeList.size() && j<borrowerList.size(); i++,j++) {
-                    CollateralData.Pledge pledge = pledgeList.get(i);
-                    String paymentInstrumentId = pledge.getInstrumentId();
-                    Long paymentPrice = pledge.getCurrentQuantity();
-                    CollateralData.Borrower borrower = borrowerList.get(j);
-                    String deliveryLegInstrumentId = borrower.getInstrumentId();
-                    Long deliveryLegPrice = borrower.getCurrentQuantity();
+                    Map<String, Object> pledge = pledgeList.get(i);
+                    String paymentInstrumentId = (String) pledge.get("instrumentId");
+                    Long paymentPrice = (Long) pledge.get("quantity");
+                    Map<String, Object> borrower = borrowerList.get(j);
+                    String deliveryLegInstrumentId = (String) borrower.get("instrumentId");
+                    Long deliveryLegPrice = (Long) borrower.get("quantity");
                 /*
 
                 ASSET TRANSFER FLOW STARTS

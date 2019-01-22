@@ -20,23 +20,19 @@ public class DvPEnd implements LinearState, QueryableState {
     private Party seller;
     private Party agent;
     private String dvpId;
-    private List<CollateralData.Pledge> pledgeList;
-    private List<CollateralData.Borrower> borrowerList;
+    private ArrayList<LinkedHashMap<String, Object>> pledgeList;
+    private ArrayList<LinkedHashMap<String, Object>> borrowerList;
     private UniqueIdentifier linearId;
     private Date settlementDate;
     private String repoId;
 
 
-    public DvPEnd(Party buyer, Party seller, String dvpId,
-                    UniqueIdentifier linearId, Date settlementDate,List<CollateralData.Pledge> pledgeList, List<CollateralData.Borrower> borrowerList, Party agent,String repoId) {
-        this.buyer = buyer;
-        this.seller = seller;
-        this.dvpId = dvpId;
+    public DvPEnd(
+            UniqueIdentifier linearId, ArrayList<LinkedHashMap<String, Object>> pledgeList, ArrayList<LinkedHashMap<String, Object>> borrowerList, String repoId) {
+
         this.linearId = linearId;
-        this.settlementDate = settlementDate;
         this.pledgeList = pledgeList;
         this.borrowerList = borrowerList;
-        this.agent = agent;
         this.repoId = repoId;
     }
 
@@ -78,7 +74,7 @@ public class DvPEnd implements LinearState, QueryableState {
     @Override
     public PersistentState generateMappedObject(MappedSchema schema) {
         if(schema instanceof DvPSchemaV1){
-            return new DvPSchemaV1.PersistentOper(this.buyer,this.seller,this.agent,this.dvpId, this.linearId.getId(),this.settlementDate.toString(),repoId);
+            return new DvPSchemaV1.PersistentOper(this.linearId.getId(),repoId);
         }
         else{
             throw new IllegalArgumentException("unrecognised schema");
@@ -91,11 +87,11 @@ public class DvPEnd implements LinearState, QueryableState {
         return ImmutableList.of(new DvPSchemaV1());
     }
 
-    public List<CollateralData.Pledge> getPledgeList() {
+    public ArrayList<LinkedHashMap<String, Object>> getPledgeList() {
         return pledgeList;
     }
 
-    public List<CollateralData.Borrower> getBorrowerList() {
+    public ArrayList<LinkedHashMap<String, Object>> getBorrowerList() {
         return borrowerList;
     }
 }

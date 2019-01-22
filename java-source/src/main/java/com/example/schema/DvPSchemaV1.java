@@ -39,14 +39,9 @@ public class DvPSchemaV1 extends MappedSchema {
         private String repoId;
 
 
-        public PersistentOper(Party buyer, Party seller, Party agent, String dvpId,
-                               UUID linearId, String settlementDate,String repoId) {
-            this.buyer = buyer;
-            this.seller = seller;
-            this.agent = agent;
-            this.dvpId = dvpId;
+        public PersistentOper(UUID linearId,String repoId) {
+
             this.linearId = linearId;
-            this.settlementDate = settlementDate;
             this.repoId = repoId;
         }
 
